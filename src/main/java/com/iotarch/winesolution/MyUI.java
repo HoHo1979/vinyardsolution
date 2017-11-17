@@ -4,12 +4,17 @@ import javax.servlet.annotation.WebServlet;
 
 import com.iotarch.winesolution.ui.MainUI;
 import com.iotarch.winesolution.ui.view.TemperatureView;
+import com.vaadin.annotations.Push;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
+import com.vaadin.annotations.Viewport;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.ui.UI;
+
+import io.reactivex.Observable;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * This UI is the application entry point. A UI may either represent a browser window 
@@ -19,6 +24,7 @@ import com.vaadin.ui.UI;
  * overridden to add component to the user interface and initialize non-component functionality.
  */
 @Theme("mytheme")
+@Viewport("width=device-width")
 public class MyUI extends UI {
 
 	Navigator navigator;
@@ -26,7 +32,6 @@ public class MyUI extends UI {
     @Override
     protected void init(VaadinRequest vaadinRequest) {
         
-    	
     	MainUI ui = new MainUI();
     	
     	navigator = new Navigator(this,ui.getContent());
