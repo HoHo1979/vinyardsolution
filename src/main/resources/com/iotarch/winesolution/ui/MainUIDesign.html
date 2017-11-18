@@ -6,30 +6,35 @@
   <meta name="vaadin-version" content="8.0.5">
  </head>
  <body>
-  <vaadin-horizontal-layout style-name="valo-menu-responsive" responsive id="responsive-application-template" size-full>
+  <vaadin-horizontal-layout style-name="valo-menu-responsive" spacing="false" responsive id="responsive-application-template" size-full>
    <vaadin-css-layout style-name="valo-menu">
     <vaadin-css-layout style-name="valo-menu-part">
-     <vaadin-horizontal-layout style-name="valo-menu-title" width-full _id="menuTitle">
+     <vaadin-horizontal-layout style-name="valo-menu-title" spacing="false" width-full _id="menuTitle">
       <vaadin-label _id="menuTitleLabel" :middle :expand>
-        The 
-       <strong>Application</strong>
+       <strong>Wine Solution System</strong>
       </vaadin-label>
      </vaadin-horizontal-layout>
      <vaadin-button icon="fonticon://FontAwesome/f03a" style-name="primary small valo-menu-toggle" plain-text _id="menuToggle">
        Menu 
      </vaadin-button>
      <vaadin-css-layout style-name="valo-menuitems" _id="menuItems">
-      <vaadin-button icon="fonticon://FontAwesome/f007" primary-style-name="valo-menu-item" width-full plain-text _id="userButton">
-        User 
+      <vaadin-button icon="fonticon://Vaadin-Icons/e73c" primary-style-name="valo-menu-item" width-full plain-text _id="temperatureButton">
+        Temperature 
       </vaadin-button>
-      <vaadin-button icon="fonticon://FontAwesome/f080" primary-style-name="valo-menu-item" _id="statusButton">
-        Status 
+      <vaadin-button icon="fonticon://Vaadin-Icons/e760" primary-style-name="valo-menu-item" width-full plain-text _id="humidityButton">
+        Humidity 
       </vaadin-button>
-      <vaadin-button icon="fonticon://FontAwesome/f01c" primary-style-name="valo-menu-item" _id="inboxButton">
+      <vaadin-button icon="fonticon://Vaadin-Icons/e6a1" primary-style-name="valo-menu-item" width-full plain-text _id="moistureButton">
+        Soil Moisture 
+      </vaadin-button>
+      <vaadin-button icon="fonticon://FontAwesome/f080" primary-style-name="valo-menu-item" _id="reportButton">
+        Report 
+      </vaadin-button>
+      <vaadin-button visible="false" icon="fonticon://FontAwesome/f01c" primary-style-name="valo-menu-item" _id="inboxButton">
         Inbox 
        <span class="valo-menu-badge">7</span>
       </vaadin-button>
-      <vaadin-button icon="fonticon://FontAwesome/f187" primary-style-name="valo-menu-item" _id="archiveButton">
+      <vaadin-button visible="false" icon="fonticon://FontAwesome/f187" primary-style-name="valo-menu-item" _id="archiveButton">
         Archive 
       </vaadin-button>
       <vaadin-button icon="fonticon://FontAwesome/f1de" primary-style-name="valo-menu-item" _id="settingsButton">
@@ -41,7 +46,7 @@
      </vaadin-css-layout>
     </vaadin-css-layout>
    </vaadin-css-layout>
-   <vaadin-vertical-layout _id="content" :expand></vaadin-vertical-layout>
+   <vaadin-panel size-full _id="contentPanel" :expand></vaadin-panel>
   </vaadin-horizontal-layout>
  </body>
 </html>

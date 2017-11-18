@@ -2,7 +2,12 @@ package com.iotarch.winesolution;
 
 import javax.servlet.annotation.WebServlet;
 
+import org.eclipse.jdt.internal.compiler.batch.Main;
+
 import com.iotarch.winesolution.ui.MainUI;
+import com.iotarch.winesolution.ui.view.HumidityView;
+import com.iotarch.winesolution.ui.view.MainView;
+import com.iotarch.winesolution.ui.view.SoilMoistureView;
 import com.iotarch.winesolution.ui.view.TemperatureView;
 import com.vaadin.annotations.Push;
 import com.vaadin.annotations.Theme;
@@ -11,6 +16,8 @@ import com.vaadin.annotations.Viewport;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.UI;
 
 import io.reactivex.Observable;
@@ -28,21 +35,36 @@ import io.reactivex.schedulers.Schedulers;
 public class MyUI extends UI {
 
 	Navigator navigator;
+
+	
 	
     @Override
     protected void init(VaadinRequest vaadinRequest) {
         
     	MainUI ui = new MainUI();
-    	
-    	navigator = new Navigator(this,ui.getContent());
+   
+    	navigator = new Navigator(this,ui.getContentPanel());
+    	navigator.addView(MainView.NAME,MainView.class);
     	navigator.addView(TemperatureView.NAME,TemperatureView.class);
-    	navigator.navigateTo(TemperatureView.NAME);
+    	navigator.addView(HumidityView.NAME, HumidityView.class);
+    	navigator.addView(SoilMoistureView.NAME,SoilMoistureView.class);
+
+    	ui.getTemperatureButton().addClickListener(e->navigator.navigateTo(TemperatureView.NAME));
+    	ui.getSoilMositureButton().addClickListener(e->navigator.navigateTo(SoilMoistureView.NAME));
+    	ui.getHumidityButton().addClickListener(e->navigator.navigateTo(HumidityView.NAME));
     	
         setContent(ui);
     }
+    
+
+    
 
     @WebServlet(urlPatterns = "/*", name = "MyUIServlet", asyncSupported = true)
     @VaadinServletConfiguration(ui = MyUI.class, productionMode = false)
     public static class MyUIServlet extends VaadinServlet {
     }
+    
+    
+    
+    
 }

@@ -1,15 +1,35 @@
 package com.iotarch.winesolution.ui;
 
-import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Panel;
 
 public class MainUI extends MainUIDesign {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -6974551182301633758L;
 
 	public MainUI() {
 			
 	}
 	
-	public VerticalLayout getContent() {
-		return content;
+	
+	public Button getTemperatureButton(){
+		return temperatureButton;
+	}
+	
+	
+	public Button getHumidityButton() {
+		return humidityButton;
+	}
+	
+	public Button getSoilMositureButton() {
+		return moistureButton;
+	}
+	
+	public Panel getContentPanel() {
+		return contentPanel;
 	}
 	
 	

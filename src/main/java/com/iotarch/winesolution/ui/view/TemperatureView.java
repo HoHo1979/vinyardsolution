@@ -30,7 +30,7 @@ import com.vaadin.ui.Grid;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.renderers.NumberRenderer;
 
-public class TemperatureView extends VerticalLayout implements View {
+public class TemperatureView extends VerticalLayout implements View{
 	
 	/**
 	 * 
@@ -38,8 +38,8 @@ public class TemperatureView extends VerticalLayout implements View {
 	private static final long serialVersionUID = 1L;
 	public static final String NAME="temperature";
 	final String DEGREE  = "\u00b0";
+	Chart currentTemperatureChart;
 	Chart temperatureChart;
-	Chart humidityChart;
 	Board board;
 	Grid<Temperature> temperatureGrid;
 	List<Temperature> timeTemperatureList;
@@ -50,21 +50,17 @@ public class TemperatureView extends VerticalLayout implements View {
 		
 		createBoard();
 		
-		createTemperatureChart();
+		createCurrentTemperatureChart();
 		
-		createHumidityChart();
+		createTemperatureChart();
 		
 		createTemperatureGrid();
 		
-		CssLayout cssLayout = new CssLayout(temperatureChart);
-		CssLayout humLayout = new CssLayout(humidityChart);
+		board.addRow(currentTemperatureChart,temperatureChart);
 		
-		board.addRow(cssLayout,humLayout);
 		board.addRow(temperatureGrid);
-		
-		addComponent(board);
 
-		
+		addComponent(board);
 	}
 
 	private void createBoard() {
@@ -79,29 +75,31 @@ public class TemperatureView extends VerticalLayout implements View {
 		
 		temperatureGrid = new Grid<Temperature>();
 		
+		temperatureGrid.setWidth("100%");
+	
+		temperatureGrid.addColumn(x->x.getDate()).setCaption(Temperature.HEADER_TIME);
+		temperatureGrid
+			.addColumn(x->x.getTemp(),new NumberRenderer(new DecimalFormat("##.## 'C'")))
+			.setCaption(Temperature.HEADER_TEMP);
 		
-		temperatureGrid.addColumn(x->x.getDate());
-		temperatureGrid.addColumn(x->x.getTemp(),new NumberRenderer(new DecimalFormat("##.## 'C'")));
-		
-		
+			
 		ListDataProvider<Temperature> tempDataProvider = new ListDataProvider<>(timeTemperatureList);
 		
 		temperatureGrid.setDataProvider(tempDataProvider);
 	
 		
 		
-		
 	}
 
-	private void createHumidityChart() {
+	private void createTemperatureChart() {
 		
-		humidityChart = new Chart();
+		temperatureChart = new Chart();
 
-		humidityChart.setTimeline(true);
+		temperatureChart.setTimeline(true);
 		
-		Configuration conf = humidityChart.getConfiguration();
-		conf.setTitle("Humidity");
-		conf.setSubTitle("Humidity in a Day/15 mins");
+		Configuration conf = temperatureChart.getConfiguration();
+		conf.setTitle(StringHelper.TEMP);
+		conf.setSubTitle(StringHelper.TEMPERATURE_CHART_SUBTITLE);
 		conf.getNavigator().setEnabled(false);
 		
 		conf.getxAxis().setType(AxisType.DATETIME);
@@ -137,7 +135,7 @@ public class TemperatureView extends VerticalLayout implements View {
 	    
 	    conf.setSeries(series);
 
-	    humidityChart.setConfiguration(conf);
+	    temperatureChart.setConfiguration(conf);
 	}
 
 	private void createTimeTempeartureData() {
@@ -154,11 +152,11 @@ public class TemperatureView extends VerticalLayout implements View {
 		}
 	}
 
-	private void createTemperatureChart() {
+	private void createCurrentTemperatureChart() {
 		
-		temperatureChart = new Chart(ChartType.GAUGE);
+		currentTemperatureChart = new Chart(ChartType.GAUGE);
 		
-		Configuration conf = temperatureChart.getConfiguration();
+		Configuration conf = currentTemperatureChart.getConfiguration();
 		conf.setTitle(StringHelper.CURRENT_TEMPERATURE);
 		conf.getPane().setStartAngle(-135);
 		conf.getPane().setEndAngle(135);
