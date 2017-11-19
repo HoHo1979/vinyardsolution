@@ -5,7 +5,7 @@ import java.util.Date;
 
 import com.iotarch.winesolution.helper.StringHelper;
 
-public class Temperature {
+public class TemperatureEntity extends AbstractFirebaseEntity {
 	
 	
 	public static final String TIME="time";
@@ -14,23 +14,19 @@ public class Temperature {
 	public static final String HEADER_TEMP=StringHelper.TEMP;
 	
 	
-	String key;
 	long time;
 	double temp;
 	
-	public Temperature(Long time, Double temp) {
+	public TemperatureEntity() {
+		
+	}
+	
+	public TemperatureEntity(Long time, Double temp) {
 		this.time=time;
 		this.temp=temp;
 	}
 
-	public String getKey() {
-		return key;
-	}
-	
-	public void setKey(String key) {
-		this.key = key;
-	}
-	
+
 	public long getTime() {
 		return time;
 	}

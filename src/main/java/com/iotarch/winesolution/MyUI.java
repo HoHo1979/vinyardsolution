@@ -41,7 +41,7 @@ public class MyUI extends UI {
     @Override
     protected void init(VaadinRequest vaadinRequest) {
         
-    	MainUI ui = new MainUI();
+    	MainUI ui = new MainUI();  
    
     	navigator = new Navigator(this,ui.getContentPanel());
     	navigator.addView(MainView.NAME,MainView.class);
