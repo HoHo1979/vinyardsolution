@@ -16,16 +16,12 @@ import com.vaadin.addon.charts.model.ChartType;
 import com.vaadin.addon.charts.model.Configuration;
 import com.vaadin.addon.charts.model.DataSeries;
 import com.vaadin.addon.charts.model.DataSeriesItem;
-import com.vaadin.addon.charts.model.DateTimeLabelFormats;
 import com.vaadin.addon.charts.model.Labels;
 import com.vaadin.addon.charts.model.ListSeries;
 import com.vaadin.addon.charts.model.PlotBand;
-import com.vaadin.addon.charts.model.PlotLine;
 import com.vaadin.addon.charts.model.PlotOptionsColumn;
 import com.vaadin.addon.charts.model.PlotOptionsLine;
 import com.vaadin.addon.charts.model.RangeSelector;
-import com.vaadin.addon.charts.model.Tooltip;
-import com.vaadin.addon.charts.model.XAxis;
 import com.vaadin.addon.charts.model.YAxis;
 import com.vaadin.addon.charts.model.style.SolidColor;
 import com.vaadin.addon.charts.model.style.Style;
@@ -52,6 +48,7 @@ public class TemperatureView extends VerticalLayout implements View{
 	List<TemperatureEntity> timeTemperatureList;
 	List<HumidityEntity> timeHumidityList;
 	Grid<HumidityEntity> humidityGrid;
+	Configuration conf;
 	
 	public TemperatureView() {
 		
@@ -63,13 +60,17 @@ public class TemperatureView extends VerticalLayout implements View{
 		
 		createBoard();
 		
+		initTemperatureChart();
+
 		createCurrentTemperatureChart();
-		
-		createTemperatureChart();
 		
 		createHumidityChart();
 		
+		createTemperatureChart();
+		
 		createTemperatureGrid();
+		
+		temperatureChart.drawChart(conf);
 		
 		board.addRow(currentTemperatureChart,temperatureChart);
 		
@@ -78,43 +79,64 @@ public class TemperatureView extends VerticalLayout implements View{
 		addComponent(board);
 	}
 
+	private void initTemperatureChart() {
+		temperatureChart = new Chart();
+	
+		conf = temperatureChart.getConfiguration();
+		
+		
+		temperatureChart.setTimeline(true);
+		
+		conf.setTitle(StringHelper.TEMP);
+		conf.setSubTitle(StringHelper.TEMPERATURE_CHART_SUBTITLE);
+		conf.getNavigator().setEnabled(false);
+		
+		RangeSelector rangeSelector = new RangeSelector();
+		rangeSelector.setSelected(1);
+		conf.setRangeSelector(rangeSelector);
+		
+		conf.getxAxis().setType(AxisType.DATETIME);
+	}
+
 	private void createHumidityChart() {
 		
-		Configuration conf=temperatureChart.getConfiguration();
 		
 		YAxis y2 = new YAxis();
+		y2.setGridLineWidth(0);
         AxisTitle title = new AxisTitle("Humidity");
         Style style = new Style();
         style.setColor(SolidColor.BLUEVIOLET);
+        title.setStyle(style);
         y2.setTitle(title);
         Labels labels = new Labels();
         labels.setFormatter("this.value +' %'");
-        style = new Style();
+        style = new Style(); 
         style.setColor(SolidColor.PURPLE);
         labels.setStyle(style);
         y2.setLabels(labels);
+        y2.setOpposite(false);
+        y2.setLineWidth(2);  
+        
         conf.addyAxis(y2);
-		
+        	
 		
         DataSeries series = new DataSeries();
         
         series.setName("Humidity");
         
+        PlotOptionsColumn plotOptionsColumn = new PlotOptionsColumn();
+        plotOptionsColumn.setColor(SolidColor.LIGHTSKYBLUE);
+    
+        series.setPlotOptions(plotOptionsColumn);
         
         timeHumidityList.forEach(h->{
-        	
-        	DataSeriesItem item = new DataSeriesItem(h.getTime(), h.getHumidity());
+        	DecimalFormat dFormat= new DecimalFormat("##.#");
+			Double humDobule2Decimal = new Double(dFormat.format(h.getHumidity()));        	
+        	DataSeriesItem item = new DataSeriesItem(h.getTime(),humDobule2Decimal);
         	series.add(item);
         	
         });
         
-        //With this PlotOptionsColumn, the code will not working and error at run time.
-//		PlotOptionsColumn column = new PlotOptionsColumn();
-//		column.addColor(SolidColor.BLUEVIOLET);
-//		column.setPointWidth(10);
-		
-		
-//		series.setPlotOptions(column);
 		
 		conf.addSeries(series);
 		
@@ -178,54 +200,34 @@ public class TemperatureView extends VerticalLayout implements View{
 
 	private void createTemperatureChart() {
 		
-		temperatureChart = new Chart();
-
-		temperatureChart.setTimeline(true);
-		
-		Configuration conf = temperatureChart.getConfiguration();
-		conf.setTitle(StringHelper.TEMP);
-		conf.setSubTitle(StringHelper.TEMPERATURE_CHART_SUBTITLE);
-		conf.getNavigator().setEnabled(false);
-		
-	//	conf.getTooltip().setFormatter(_fn_formatter);
-		
-
-		conf.getxAxis().setType(AxisType.DATETIME);
-		
-//		Tooltip tooltip = new Tooltip();
-//		String dateTimeFormat = new DateTimeLabelFormats().getHour();
-//		tooltip.setXDateFormat(dateTimeFormat);
-//		tooltip.setPointFormat("<span style=\"color:{series.color}\">{series.name}</span>: <b>{point.y}</b> ({point.change}%)<br/>");
-//		tooltip.setValueDecimals(2);
-//        conf.setTooltip(tooltip);
-		
-		XAxis xAxis = new XAxis();	
-//		xAxis.getLabels().setFormat("{value:%Y-%m-%d %H:%M}");
-		xAxis.setDateTimeLabelFormats(
-				new DateTimeLabelFormats("%e. %b", "%b"));
-		conf.addxAxis(xAxis);	
 	
 		YAxis y = new YAxis();
 		
-		PlotLine plotLine = new PlotLine();
-		plotLine.setWidth(2);
-		plotLine.setColor(SolidColor.AQUA);		
-		y.setPlotLines(plotLine);
-        y.setMin(0);
-        //Makes Error and won't display
-//        Labels yLabels=y.getLabels();
-//        yLabels.setFormat("{point.y:%2.2f}");
+		AxisTitle title = new AxisTitle("Temperature");
+        Style style = new Style();
+        style.setColor(SolidColor.RED);
+        y.setTitle(title);
+        Labels labels = new Labels();
+        labels.setFormatter("this.value +'°C'");
+        style = new Style();
+        style.setColor(SolidColor.BLACK);
+        labels.setStyle(style);
+        y.setLabels(labels);	
+        y.setOpposite(true);
         
-        
-//        conf
-//        .getTooltip()
-//        .setFormatter(
-//                "'<b>'+ this.series.name +'</b><br/>\'+ this.x +': '+ this.y +' °C'");
         
         conf.addyAxis(y);
 		
-
 		DataSeries series = new DataSeries();
+
+		series.setName("Temperature");
+		
+		
+		
+		PlotOptionsLine line = new PlotOptionsLine();
+	    line.setColor(SolidColor.BROWN);
+	        	
+		series.setPlotOptions(line);
 		
 		timeTemperatureList.forEach(x->{
 			
@@ -235,13 +237,9 @@ public class TemperatureView extends VerticalLayout implements View{
 			series.add(item);
 		});
 		
-		RangeSelector rangeSelector = new RangeSelector();
-		rangeSelector.setSelected(1);
-		conf.setRangeSelector(rangeSelector);
 	    
 	    conf.addSeries(series);
 
-	    temperatureChart.setConfiguration(conf);
 	}
 
 	private void createTimeTempeartureData(long t, int maxReading) {
