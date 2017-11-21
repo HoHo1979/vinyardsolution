@@ -2,9 +2,7 @@ package com.iotarch.winesolution.entity;
 
 public class HumidityEntity extends AbstractFirebaseEntity {
 	
-	Long time;
 	Double humidity;
-	
 	
 	public HumidityEntity() {
 		
@@ -15,12 +13,7 @@ public class HumidityEntity extends AbstractFirebaseEntity {
 		this.humidity=humidity;
 	}
 	
-	public Long getTime() {
-		return time;
-	}
-	public void setTime(Long time) {
-		this.time = time;
-	}
+
 	public Double getHumidity() {
 		return humidity;
 	}

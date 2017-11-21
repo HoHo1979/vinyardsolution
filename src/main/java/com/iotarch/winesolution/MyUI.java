@@ -2,26 +2,18 @@ package com.iotarch.winesolution;
 
 import javax.servlet.annotation.WebServlet;
 
-import org.eclipse.jdt.internal.compiler.batch.Main;
-
 import com.iotarch.winesolution.ui.MainUI;
 import com.iotarch.winesolution.ui.view.HumidityView;
 import com.iotarch.winesolution.ui.view.MainView;
 import com.iotarch.winesolution.ui.view.SoilMoistureView;
 import com.iotarch.winesolution.ui.view.TemperatureView;
-import com.vaadin.annotations.Push;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.annotations.Viewport;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.UI;
-
-import io.reactivex.Observable;
-import io.reactivex.schedulers.Schedulers;
 
 /**
  * This UI is the application entry point. A UI may either represent a browser window 
