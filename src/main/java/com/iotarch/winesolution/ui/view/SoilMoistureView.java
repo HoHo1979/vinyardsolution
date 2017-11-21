@@ -80,6 +80,8 @@ public class SoilMoistureView extends VerticalLayout implements View {
 	}
 
 	private void createGoogleMap() {
+		
+		//Get your own GooleMapAPIKEY
 		googleMap = new GoogleMap(GoogleMapAPI.KEY, null, null);
         // uncomment to enable Chinese API.
         //googleMap.setApiUrl("maps.google.com.au");
@@ -90,7 +92,7 @@ public class SoilMoistureView extends VerticalLayout implements View {
         
         for(SoilMositureSensorEntity sensor:soilMositureSensors) {
         
-        	 System.out.println(sensor.getSensorName()+" "+sensor.getLatLon().getLat()+" "+sensor.getLatLon().getLon());
+        //	 System.out.println(sensor.getSensorName()+" "+sensor.getLatLon().getLat()+" "+sensor.getLatLon().getLon());
         	 GoogleMapMarker gMapMarker = new GoogleMapMarker(sensor.getSensorName(), new LatLon(sensor.getLatLon().getLat(),sensor.getLatLon().getLon()), true);
              googleMap.addMarker(gMapMarker);
              
