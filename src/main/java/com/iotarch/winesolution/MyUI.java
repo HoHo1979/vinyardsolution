@@ -1,12 +1,21 @@
 package com.iotarch.winesolution;
 
+import java.io.IOException;
+import java.util.Date;
+
 import javax.servlet.annotation.WebServlet;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.iotarch.winesolution.ui.MainUI;
 import com.iotarch.winesolution.ui.view.HumidityView;
 import com.iotarch.winesolution.ui.view.MainView;
 import com.iotarch.winesolution.ui.view.SoilMoistureView;
 import com.iotarch.winesolution.ui.view.TemperatureView;
+import com.vaadin.annotations.Push;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.annotations.Viewport;
@@ -24,6 +33,7 @@ import com.vaadin.ui.UI;
  */
 @Theme("mytheme")
 @Viewport("width=device-width")
+@Push
 public class MyUI extends UI {
 
 	Navigator navigator;
@@ -32,7 +42,16 @@ public class MyUI extends UI {
 	
     @Override
     protected void init(VaadinRequest vaadinRequest) {
-        
+   
+    	try {
+			FirebaseConfiguration firebaseConfiguration = new FirebaseConfiguration();
+		} catch (IOException e1) {
+	
+			e1.printStackTrace();
+		}
+    	
+    
+    	
     	MainUI ui = new MainUI();  
    
     	navigator = new Navigator(this,ui.getContentPanel());

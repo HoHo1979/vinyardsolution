@@ -4,9 +4,13 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Random;
-
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
+import com.iotarch.winesolution.FirebaseConfiguration;
 import com.iotarch.winesolution.entity.HumidityEntity;
+import com.iotarch.winesolution.entity.TempHumEntity;
 import com.iotarch.winesolution.entity.TemperatureEntity;
 import com.iotarch.winesolution.helper.StringHelper;
 import com.vaadin.addon.charts.Chart;
@@ -14,10 +18,8 @@ import com.vaadin.addon.charts.model.AxisTitle;
 import com.vaadin.addon.charts.model.AxisType;
 import com.vaadin.addon.charts.model.ChartType;
 import com.vaadin.addon.charts.model.Configuration;
-import com.vaadin.addon.charts.model.DataSeries;
-import com.vaadin.addon.charts.model.DataSeriesItem;
+import com.vaadin.addon.charts.model.DataProviderSeries;
 import com.vaadin.addon.charts.model.Labels;
-import com.vaadin.addon.charts.model.ListSeries;
 import com.vaadin.addon.charts.model.PlotBand;
 import com.vaadin.addon.charts.model.PlotOptionsColumn;
 import com.vaadin.addon.charts.model.PlotOptionsLine;
@@ -26,13 +28,15 @@ import com.vaadin.addon.charts.model.YAxis;
 import com.vaadin.addon.charts.model.style.SolidColor;
 import com.vaadin.addon.charts.model.style.Style;
 import com.vaadin.board.Board;
+import com.vaadin.data.provider.DataProvider;
 import com.vaadin.data.provider.ListDataProvider;
 import com.vaadin.navigator.View;
+import com.vaadin.navigator.ViewBeforeLeaveEvent;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.renderers.NumberRenderer;
 
-public class TemperatureView extends VerticalLayout implements View{
+public class TemperatureView extends VerticalLayout implements View, ValueEventListener{
 	
 	/**
 	 * 
@@ -50,6 +54,12 @@ public class TemperatureView extends VerticalLayout implements View{
 	Grid<HumidityEntity> humidityGrid;
 	Configuration conf;
 	
+	ListDataProvider<TemperatureEntity> tempDataProvider;
+	ListDataProvider<HumidityEntity> humiDataProvider;
+
+	
+	double currentTemperature;
+	
 	public TemperatureView() {
 		
 		long time = new Date().getTime();
@@ -57,6 +67,10 @@ public class TemperatureView extends VerticalLayout implements View{
 		createTimeTempeartureData(time,maxReading);
 		
 		createHumidityData(time,maxReading);
+		
+		humiDataProvider = new ListDataProvider<>(timeHumidityList);
+		
+		tempDataProvider = new ListDataProvider<>(timeTemperatureList);
 		
 		createBoard();
 		
@@ -119,23 +133,26 @@ public class TemperatureView extends VerticalLayout implements View{
         
         conf.addyAxis(y2);
         	
-		
-        DataSeries series = new DataSeries();
+	
+        
+        DataProviderSeries<HumidityEntity> series = new DataProviderSeries<>(humiDataProvider,HumidityEntity::getHumidity);
         
         series.setName("Humidity");
+        
+        series.setX(HumidityEntity::getTime);
         
         PlotOptionsColumn plotOptionsColumn = new PlotOptionsColumn();
         plotOptionsColumn.setColor(SolidColor.LIGHTSKYBLUE);
     
         series.setPlotOptions(plotOptionsColumn);
         
-        timeHumidityList.forEach(h->{
-        	DecimalFormat dFormat= new DecimalFormat("##.#");
-			Double humDobule2Decimal = new Double(dFormat.format(h.getHumidity()));        	
-        	DataSeriesItem item = new DataSeriesItem(h.getTime(),humDobule2Decimal);
-        	series.add(item);
-        	
-        });
+//        timeHumidityList.forEach(h->{
+//        	DecimalFormat dFormat= new DecimalFormat("##.#");
+//			Double humDobule2Decimal = new Double(dFormat.format(h.getHumidity()));        	
+//        	DataSeriesItem item = new DataSeriesItem(h.getTime(),humDobule2Decimal);
+//        	series.add(item);
+//        	
+//        });
         
 		
 		conf.addSeries(series);
@@ -147,25 +164,25 @@ public class TemperatureView extends VerticalLayout implements View{
 		
 		timeHumidityList = new ArrayList<>();
 		
-		for(int i=0;i<maxReading;i++) {
+//		for(int i=0;i<maxReading;i++) {
+//			
+//			t=t+900000;//1000*60*15
+//			
+//			double humidity;
+//			
+//			while(true) {
+//				
+//				humidity = new Random().nextDouble()*100;
+//				
+//				if(humidity>40 && humidity<85) {
+//					break;
+//				}
+//				
+//			}
+//
+//			timeHumidityList.add(new HumidityEntity(t,humidity));
 			
-			t=t+900000;//1000*60*15
-			
-			double humidity;
-			
-			while(true) {
-				
-				humidity = new Random().nextDouble()*100;
-				
-				if(humidity>40 && humidity<85) {
-					break;
-				}
-				
-			}
-
-			timeHumidityList.add(new HumidityEntity(t,humidity));
-			
-		}
+//		}
 		
 		
 	}
@@ -190,8 +207,7 @@ public class TemperatureView extends VerticalLayout implements View{
 			.setCaption(TemperatureEntity.HEADER_TEMP);
 		
 			
-		ListDataProvider<TemperatureEntity> tempDataProvider = new ListDataProvider<>(timeTemperatureList);
-		
+	
 		temperatureGrid.setDataProvider(tempDataProvider);
 	
 		
@@ -218,25 +234,34 @@ public class TemperatureView extends VerticalLayout implements View{
         
         conf.addyAxis(y);
 		
-		DataSeries series = new DataSeries();
+      
+        
+        DataProviderSeries<TemperatureEntity> series = new DataProviderSeries<>(tempDataProvider,TemperatureEntity::getTemp);
 
 		series.setName("Temperature");
-		
-		
-		
+		series.setX(TemperatureEntity::getTime);
+
 		PlotOptionsLine line = new PlotOptionsLine();
 	    line.setColor(SolidColor.BROWN);
 	        	
 		series.setPlotOptions(line);
 		
-		timeTemperatureList.forEach(x->{
-			
-			DecimalFormat dFormat= new DecimalFormat("##.##");
-			Double tempDobule2Decimal = new Double(dFormat.format(x.getTemp()));
-			DataSeriesItem item = new DataSeriesItem(x.getTime(), tempDobule2Decimal);
-			series.add(item);
-		});
 		
+		
+		DatabaseReference reference = FirebaseConfiguration.getFirebaseDB().child("MyTemp");
+		
+		reference.limitToLast(20).addValueEventListener(this);
+		
+		
+		
+//		timeTemperatureList.forEach(x->{
+//			
+//			DecimalFormat dFormat= new DecimalFormat("##.##");
+//			Double tempDobule2Decimal = new Double(dFormat.format(x.getTemp()));
+//			DataSeriesItem item = new DataSeriesItem(x.getTime(), tempDobule2Decimal);
+//			series.add(item);
+//		});
+//		
 	    
 	    conf.addSeries(series);
 
@@ -246,18 +271,26 @@ public class TemperatureView extends VerticalLayout implements View{
 		
 		timeTemperatureList = new ArrayList<>();
 
-		for(int i=0;i<maxReading;i++) {
-			
-			t=t+900000;//1000*60*15
-			
-			timeTemperatureList.add(new TemperatureEntity(t,new Random().nextDouble()*50));
-			
-		}
+//		for(int i=0;i<maxReading;i++) {
+//			
+//			t=t+900000;//1000*60*15
+//			
+//			timeTemperatureList.add(new TemperatureEntity(t,new Random().nextDouble()*50));
+//			
+//		}
 	}
 
 	private void createCurrentTemperatureChart() {
 		
 		currentTemperatureChart = new Chart(ChartType.GAUGE);
+		
+		List<Double> temperatureList = new ArrayList<>(); 
+		
+		temperatureList.add(33.33);
+		
+		DataProvider<Double,?> temDataProvider = new ListDataProvider<>(temperatureList);
+		
+		DataProviderSeries<Double> series = new DataProviderSeries<>(temDataProvider,Double::doubleValue);
 		
 		Configuration conf = currentTemperatureChart.getConfiguration();
 		conf.setTitle(StringHelper.CURRENT_TEMPERATURE);
@@ -287,8 +320,125 @@ public class TemperatureView extends VerticalLayout implements View{
 
 		conf.addyAxis(yaxis);
 		
-		ListSeries series = new ListSeries("Temperature", 24);
+		
+		DatabaseReference temRef = FirebaseConfiguration.getFirebaseDB().child("MyTemp");
+    	
+    	temRef.limitToLast(1).addListenerForSingleValueEvent(new ValueEventListener() {
+			
+			@Override
+			public void onDataChange(DataSnapshot tempSnapShots) {
+				
+				 for (DataSnapshot tempSnapShot: tempSnapShots.getChildren()) {
+			            String temperature = (String) tempSnapShot.child("temperature").getValue();
+			            String humidity = (String) tempSnapShot.child("humidity").getValue();
+			            long time = (long) tempSnapShot.child("time").getValue();
+			            System.out.println("Temperature "+temperature+" Humidity "+humidity+" Time "+new Date(time));
+			            temperatureList.removeAll(temperatureList);
+			            temperatureList.add(new Double(temperature));
+			            
+				 }
+				 
+				 /*This does not update until I touch the grid, My Guess is it cannot find which View to match to.
+				  * 
+				  * UI.getCurrent().access(new Runnable(){
+				  * 
+				  * @Override
+					public void run() {
+						
+						temDataProvider.refreshAll();
+						
+					}
+				  * 
+				  * }
+				  */
+				 
+			
+				//This works to update the UI.
+				getUI().access(new Runnable() {
+					
+					@Override
+					public void run() {
+						
+						temDataProvider.refreshAll();
+						
+					}
+				});
+				 
+			}
+			
+			@Override
+			public void onCancelled(DatabaseError arg0) {
+				
+				
+			}
+		});
+    	
+		
 		conf.addSeries(series);
 	}
+
+	@Override
+	public void onCancelled(DatabaseError arg0) {
+		
+		
+	}
+
+
+	@Override
+	public void onDataChange(DataSnapshot dataSnapshots) {
+		
+		timeTemperatureList.removeAll(timeTemperatureList);
+		timeHumidityList.removeAll(timeHumidityList);
+		
+		for(DataSnapshot dataSnapshot:dataSnapshots.getChildren()) {
+		
+			TempHumEntity tempHumEntity=dataSnapshot.getValue(TempHumEntity.class);
+			
+			System.out.println(tempHumEntity.getTemperature()+tempHumEntity.getHumidity()+ new Date(tempHumEntity.getTime()));
+			
+			TemperatureEntity temperatureEntity = 
+					new TemperatureEntity(tempHumEntity.getTime(),Double.valueOf(tempHumEntity.getTemperature()));
+			
+			HumidityEntity humidityEntity =
+					new HumidityEntity(tempHumEntity.getTime(),Double.valueOf(tempHumEntity.getHumidity()));
+			
+			timeTemperatureList.add(temperatureEntity);
+			timeHumidityList.add(humidityEntity);
+		
+		}
+		
+		//If put two refershAll at the same access, will cause currentError
+		getUI().access(new Runnable() {
+			
+			@Override
+			public void run() {
+				humiDataProvider.refreshAll();
+				
+			}
+		});
+		
+		getUI().access(new Runnable() {
+			
+			@Override
+			public void run() {
+				
+				tempDataProvider.refreshAll();
+				
+			}
+		});
+		
+	}
+
+	@Override
+	public void beforeLeave(ViewBeforeLeaveEvent event) {
+		
+		FirebaseConfiguration.getFirebaseDB().removeEventListener(this);
+		
+		View.super.beforeLeave(event);
+	}
+
+
+
+
 
 }
