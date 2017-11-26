@@ -135,7 +135,7 @@ public class TemperatureView extends VerticalLayout implements View, ValueEventL
         	
 	
         
-        DataProviderSeries<HumidityEntity> series = new DataProviderSeries<>(humiDataProvider,HumidityEntity::getHumidity);
+        DataProviderSeries<HumidityEntity>series = new DataProviderSeries<>(humiDataProvider,HumidityEntity::getHumidity);
         
         series.setName("Humidity");
         
@@ -332,7 +332,7 @@ public class TemperatureView extends VerticalLayout implements View, ValueEventL
 			            String temperature = (String) tempSnapShot.child("temperature").getValue();
 			            String humidity = (String) tempSnapShot.child("humidity").getValue();
 			            long time = (long) tempSnapShot.child("time").getValue();
-			            System.out.println("Temperature "+temperature+" Humidity "+humidity+" Time "+new Date(time));
+//			            System.out.println("Temperature "+temperature+" Humidity "+humidity+" Time "+new Date(time));
 			            temperatureList.removeAll(temperatureList);
 			            temperatureList.add(new Double(temperature));
 			            
@@ -394,7 +394,7 @@ public class TemperatureView extends VerticalLayout implements View, ValueEventL
 		
 			TempHumEntity tempHumEntity=dataSnapshot.getValue(TempHumEntity.class);
 			
-			System.out.println(tempHumEntity.getTemperature()+tempHumEntity.getHumidity()+ new Date(tempHumEntity.getTime()));
+//			System.out.println(tempHumEntity.getTemperature()+tempHumEntity.getHumidity()+ new Date(tempHumEntity.getTime()));
 			
 			TemperatureEntity temperatureEntity = 
 					new TemperatureEntity(tempHumEntity.getTime(),Double.valueOf(tempHumEntity.getTemperature()));
