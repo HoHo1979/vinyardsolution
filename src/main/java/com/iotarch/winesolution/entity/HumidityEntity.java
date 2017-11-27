@@ -20,6 +20,28 @@ public class HumidityEntity extends AbstractFirebaseEntity {
 	public void setHumidity(Double humidity) {
 		this.humidity = humidity;
 	}
+
+	@Override
+	public String getKey() {	
+		return super.getKey();
+	}
+
+	@Override
+	public void setKey(String key) {
+		
+		super.setKey(key);
+	}
+
+	@Override
+	public Long getTime() {
+		return super.getTime();
+	}
+
+	@Override
+	public void setTime(Long time) {
+		super.setTime(time);
+	}
+	
 	
 	
 

@@ -1,11 +1,13 @@
 package com.iotarch.winesolution.entity;
 
-public class TempHumEntity {
+import com.google.firebase.database.IgnoreExtraProperties;
+
+@IgnoreExtraProperties
+public class TempHumEntity extends AbstractFirebaseEntity {
 
 	String temperature;
 	String humidity;
 	Long time;
-	
 	
 	public TempHumEntity() {
 		

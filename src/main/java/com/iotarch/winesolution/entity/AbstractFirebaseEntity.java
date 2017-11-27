@@ -1,5 +1,8 @@
 package com.iotarch.winesolution.entity;
 
+import com.google.firebase.database.IgnoreExtraProperties;
+
+@IgnoreExtraProperties
 public abstract class AbstractFirebaseEntity {
 	
 	String key;

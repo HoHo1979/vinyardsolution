@@ -199,8 +199,7 @@ public class TemperatureView extends VerticalLayout implements View, ValueEventL
         
         conf.addyAxis(y);
 		
-      
-        
+       
         DataProviderSeries<TemperatureEntity> series = new DataProviderSeries<>(tempDataProvider,TemperatureEntity::getTemp);
 
 		series.setName("Temperature");
@@ -215,7 +214,7 @@ public class TemperatureView extends VerticalLayout implements View, ValueEventL
 		
 		DatabaseReference reference = FirebaseConfiguration.getFirebaseDB().child("MyTemp");
 		
-		reference.limitToLast(20).addValueEventListener(this);
+		reference.addValueEventListener(this);
 		
 
 	    conf.addSeries(series);
