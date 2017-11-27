@@ -20,6 +20,7 @@ import com.vaadin.addon.charts.model.ChartType;
 import com.vaadin.addon.charts.model.Configuration;
 import com.vaadin.addon.charts.model.DataProviderSeries;
 import com.vaadin.addon.charts.model.Labels;
+import com.vaadin.addon.charts.model.ListSeries;
 import com.vaadin.addon.charts.model.PlotBand;
 import com.vaadin.addon.charts.model.PlotOptionsColumn;
 import com.vaadin.addon.charts.model.PlotOptionsLine;
@@ -57,16 +58,15 @@ public class TemperatureView extends VerticalLayout implements View, ValueEventL
 	ListDataProvider<TemperatureEntity> tempDataProvider;
 	ListDataProvider<HumidityEntity> humiDataProvider;
 
+	ListSeries gaugeSeries = new ListSeries("Temperature",0);
 	
 	double currentTemperature;
 	
 	public TemperatureView() {
 		
-		long time = new Date().getTime();
+		timeTemperatureList = new ArrayList<>();
 		
-		createTimeTempeartureData(time,maxReading);
-		
-		createHumidityData(time,maxReading);
+		timeHumidityList = new ArrayList<>();
 		
 		humiDataProvider = new ListDataProvider<>(timeHumidityList);
 		
@@ -94,6 +94,7 @@ public class TemperatureView extends VerticalLayout implements View, ValueEventL
 	}
 
 	private void initTemperatureChart() {
+		
 		temperatureChart = new Chart();
 	
 		conf = temperatureChart.getConfiguration();
@@ -133,8 +134,7 @@ public class TemperatureView extends VerticalLayout implements View, ValueEventL
         
         conf.addyAxis(y2);
         	
-	
-        
+
         DataProviderSeries<HumidityEntity>series = new DataProviderSeries<>(humiDataProvider,HumidityEntity::getHumidity);
         
         series.setName("Humidity");
@@ -145,47 +145,12 @@ public class TemperatureView extends VerticalLayout implements View, ValueEventL
         plotOptionsColumn.setColor(SolidColor.LIGHTSKYBLUE);
     
         series.setPlotOptions(plotOptionsColumn);
-        
-//        timeHumidityList.forEach(h->{
-//        	DecimalFormat dFormat= new DecimalFormat("##.#");
-//			Double humDobule2Decimal = new Double(dFormat.format(h.getHumidity()));        	
-//        	DataSeriesItem item = new DataSeriesItem(h.getTime(),humDobule2Decimal);
-//        	series.add(item);
-//        	
-//        });
-        
 		
 		conf.addSeries(series);
 		
 		
 	}
 
-	private void createHumidityData(long t, int maxReading) {
-		
-		timeHumidityList = new ArrayList<>();
-		
-//		for(int i=0;i<maxReading;i++) {
-//			
-//			t=t+900000;//1000*60*15
-//			
-//			double humidity;
-//			
-//			while(true) {
-//				
-//				humidity = new Random().nextDouble()*100;
-//				
-//				if(humidity>40 && humidity<85) {
-//					break;
-//				}
-//				
-//			}
-//
-//			timeHumidityList.add(new HumidityEntity(t,humidity));
-			
-//		}
-		
-		
-	}
 
 	private void createBoard() {
 		
@@ -203,7 +168,7 @@ public class TemperatureView extends VerticalLayout implements View, ValueEventL
 	
 		temperatureGrid.addColumn(x->x.getDate()).setCaption(TemperatureEntity.HEADER_TIME);
 		temperatureGrid
-			.addColumn(x->x.getTemp(),new NumberRenderer(new DecimalFormat("##.## 'C'")))
+			.addColumn(x->x.getTemp(),new NumberRenderer(new DecimalFormat("##.## '°C'")))
 			.setCaption(TemperatureEntity.HEADER_TEMP);
 		
 			
@@ -252,45 +217,15 @@ public class TemperatureView extends VerticalLayout implements View, ValueEventL
 		
 		reference.limitToLast(20).addValueEventListener(this);
 		
-		
-		
-//		timeTemperatureList.forEach(x->{
-//			
-//			DecimalFormat dFormat= new DecimalFormat("##.##");
-//			Double tempDobule2Decimal = new Double(dFormat.format(x.getTemp()));
-//			DataSeriesItem item = new DataSeriesItem(x.getTime(), tempDobule2Decimal);
-//			series.add(item);
-//		});
-//		
-	    
+
 	    conf.addSeries(series);
 
 	}
 
-	private void createTimeTempeartureData(long t, int maxReading) {
-		
-		timeTemperatureList = new ArrayList<>();
-
-//		for(int i=0;i<maxReading;i++) {
-//			
-//			t=t+900000;//1000*60*15
-//			
-//			timeTemperatureList.add(new TemperatureEntity(t,new Random().nextDouble()*50));
-//			
-//		}
-	}
 
 	private void createCurrentTemperatureChart() {
 		
 		currentTemperatureChart = new Chart(ChartType.GAUGE);
-		
-		List<Double> temperatureList = new ArrayList<>(); 
-		
-		temperatureList.add(33.33);
-		
-		DataProvider<Double,?> temDataProvider = new ListDataProvider<>(temperatureList);
-		
-		DataProviderSeries<Double> series = new DataProviderSeries<>(temDataProvider,Double::doubleValue);
 		
 		Configuration conf = currentTemperatureChart.getConfiguration();
 		conf.setTitle(StringHelper.CURRENT_TEMPERATURE);
@@ -298,7 +233,7 @@ public class TemperatureView extends VerticalLayout implements View, ValueEventL
 		conf.getPane().setEndAngle(135);
 		
 		YAxis yaxis = new YAxis();
-		yaxis.setTitle(DEGREE+"C");
+		yaxis.setTitle("°C");
 
 		// The limits are mandatory
 		yaxis.setMin(0);
@@ -320,61 +255,7 @@ public class TemperatureView extends VerticalLayout implements View, ValueEventL
 
 		conf.addyAxis(yaxis);
 		
-		
-		DatabaseReference temRef = FirebaseConfiguration.getFirebaseDB().child("MyTemp");
-    	
-    	temRef.limitToLast(1).addListenerForSingleValueEvent(new ValueEventListener() {
-			
-			@Override
-			public void onDataChange(DataSnapshot tempSnapShots) {
-				
-				 for (DataSnapshot tempSnapShot: tempSnapShots.getChildren()) {
-			            String temperature = (String) tempSnapShot.child("temperature").getValue();
-			            String humidity = (String) tempSnapShot.child("humidity").getValue();
-			            long time = (long) tempSnapShot.child("time").getValue();
-//			            System.out.println("Temperature "+temperature+" Humidity "+humidity+" Time "+new Date(time));
-			            temperatureList.removeAll(temperatureList);
-			            temperatureList.add(new Double(temperature));
-			            
-				 }
-				 
-				 /*This does not update until I touch the grid, My Guess is it cannot find which View to match to.
-				  * 
-				  * UI.getCurrent().access(new Runnable(){
-				  * 
-				  * @Override
-					public void run() {
-						
-						temDataProvider.refreshAll();
-						
-					}
-				  * 
-				  * }
-				  */
-				 
-			
-				//This works to update the UI.
-				getUI().access(new Runnable() {
-					
-					@Override
-					public void run() {
-						
-						temDataProvider.refreshAll();
-						
-					}
-				});
-				 
-			}
-			
-			@Override
-			public void onCancelled(DatabaseError arg0) {
-				
-				
-			}
-		});
-    	
-		
-		conf.addSeries(series);
+		conf.addSeries(gaugeSeries);
 	}
 
 	@Override
@@ -394,8 +275,6 @@ public class TemperatureView extends VerticalLayout implements View, ValueEventL
 		
 			TempHumEntity tempHumEntity=dataSnapshot.getValue(TempHumEntity.class);
 			
-//			System.out.println(tempHumEntity.getTemperature()+tempHumEntity.getHumidity()+ new Date(tempHumEntity.getTime()));
-			
 			TemperatureEntity temperatureEntity = 
 					new TemperatureEntity(tempHumEntity.getTime(),Double.valueOf(tempHumEntity.getTemperature()));
 			
@@ -406,6 +285,22 @@ public class TemperatureView extends VerticalLayout implements View, ValueEventL
 			timeHumidityList.add(humidityEntity);
 		
 		}
+		
+		
+		TemperatureEntity temperatureEntity=timeTemperatureList.get(timeTemperatureList.size()-1);
+
+		
+		getUI().access(new Runnable() {
+			
+			@Override
+			public void run() {
+				
+				gaugeSeries.updatePoint(0, temperatureEntity.getTemp());
+				
+				
+			}
+		});
+		
 		
 		//If put two refershAll at the same access, will cause currentError
 		getUI().access(new Runnable() {
