@@ -1,19 +1,30 @@
 package com.iotarch.winesolution.ui.view;
 
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Random;
+import java.util.concurrent.CopyOnWriteArrayList;
+
+import com.google.firebase.database.DatabaseReference;
+import com.iotarch.winesolution.FirebaseConfiguration;
+import com.iotarch.winesolution.component.MySensorCRUDComponent;
+import com.iotarch.winesolution.dateprovider.MyFirebaseCRUDDataProvider;
+import com.iotarch.winesolution.dateprovider.MyFirebaseDataProvider;
 import com.iotarch.winesolution.entity.SensorTypeEnum;
-import com.iotarch.winesolution.entity.SoilMositureEntity;
+import com.iotarch.winesolution.entity.SoilMoistureReadingEntity;
 import com.iotarch.winesolution.entity.SoilMositureSensorEntity;
 import com.iotarch.winesolution.helper.GoogleMapAPI;
 import com.vaadin.board.Board;
+import com.vaadin.data.Binder;
+import com.vaadin.data.ValueProvider;
 import com.vaadin.navigator.View;
 import com.vaadin.tapio.googlemaps.GoogleMap;
 import com.vaadin.tapio.googlemaps.client.LatLon;
 import com.vaadin.tapio.googlemaps.client.overlays.GoogleMapMarker;
+import com.vaadin.ui.Grid;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Grid.ItemClick;
+import com.vaadin.ui.Grid.SelectionMode;
+import com.vaadin.ui.components.grid.ItemClickListener;
+import com.vaadin.ui.renderers.Renderer;
 
 public class SoilMoistureView extends VerticalLayout implements View {
 	
@@ -25,59 +36,94 @@ public class SoilMoistureView extends VerticalLayout implements View {
 	private static final long serialVersionUID = 6094238691037619821L;
 	
 	Board board;
+	
 	public static final String NAME="soilMoistureView";
 	
+	List<SoilMoistureReadingEntity> soilMoistureReadings;
+	
+	MyFirebaseDataProvider<SoilMoistureReadingEntity> mySensorReadingFirebaseDataProvider;
+	
+	MyFirebaseCRUDDataProvider<SoilMositureSensorEntity> mySensorFirebaseDataProvier;
+	
+	Grid<SoilMositureSensorEntity> sensorGrid;
+	
+	Grid<SoilMoistureReadingEntity> sensorReadingGrid;
+	
+	Binder<SoilMositureSensorEntity> soilMositureBinder;
 	
 	GoogleMap googleMap;
 	
 	List<SoilMositureSensorEntity> soilMositureSensors;
+	
+	MySensorCRUDComponent mySensorCRUDComponent;
 
 	public SoilMoistureView() {
 		
-		board = new Board();
+		
+		//Sensor Readings from Firebase
+//		soilMoistureReadings = new CopyOnWriteArrayList<SoilMoistureReadingEntity>();
+//		
+//		DatabaseReference sensorDataReference=FirebaseConfiguration.getFirebaseDB().child("SoilMoisture").child("key");
+//		
+//		mySensorReadingFirebaseDataProvider = new MyFirebaseDataProvider<>(sensorDataReference,SoilMoistureReadingEntity.class);
+		
 
-		createSensorData();
+		mySensorCRUDComponent = new MySensorCRUDComponent(new SoilMositureSensorEntity());
+		
+		soilMositureBinder = mySensorCRUDComponent.getSoilMositureBinder();
+		
+		soilMositureSensors = new CopyOnWriteArrayList<SoilMositureSensorEntity>();
+		
+		DatabaseReference sensorReference = FirebaseConfiguration.getFirebaseDB().child("Sensors");
+		
+		mySensorFirebaseDataProvier = new MyFirebaseCRUDDataProvider<>(sensorReference,SoilMositureSensorEntity.class);
+
+		sensorGrid = new Grid<SoilMositureSensorEntity>(SoilMositureSensorEntity.class);
+		sensorGrid.removeColumn("key");
+		
+		sensorGrid.setSelectionMode(SelectionMode.SINGLE);
+		sensorGrid.addItemClickListener(new ItemClickListener<SoilMositureSensorEntity>() {
+
+			@Override
+			public void itemClick(ItemClick<SoilMositureSensorEntity> event) {
+				
+				SoilMositureSensorEntity soilMositureSensorEntity=event.getItem();
+				
+				if(event.getMouseEventDetails().isDoubleClick()) {
+					
+					//remove Item from the database
+					System.out.println(soilMositureSensorEntity.getKey());
+					
+				}else {
+					
+					String key=soilMositureSensorEntity.getKey();
+					soilMositureBinder.setBean(soilMositureSensorEntity);
+					
+				}
+				
+			}
+		});
+
+		
+		
+		
+		sensorGrid.setDataProvider(mySensorFirebaseDataProvier);
+			
+//		sensorReadingGrid = new Grid<SoilMoistureReadingEntity>(SoilMoistureReadingEntity.class);
+//		sensorReadingGrid.removeColumn("key");
+		
+		board = new Board();
 				
 		createGoogleMap();
 		
+		
 		board.addRow(googleMap);
+		
+		board.addRow(sensorGrid,mySensorCRUDComponent);
         
 		addComponent(board);
 	}
 
-	private void createSensorData() {
-		
-		
-		soilMositureSensors = new ArrayList<>();
-		
-		for(int s=0;s<5;s++) {
-			int n=s+1;
-			SoilMositureSensorEntity sensor=new SoilMositureSensorEntity("Sensor "+n,SensorTypeEnum.SOIL_MOISTURE);
-			
-			double x = new Random().nextDouble()/(new Random().nextInt(10)+1);
-			
-			double lat=-33.867+x;
-			double lon=151.206-x;
-			
-			sensor.setLatLon(new LatLon(lat, lon));
-			
-			List<SoilMositureEntity> mositureReadings = new ArrayList<>();
-			
-			for(int sr=0;sr<30;sr++) {
-				
-				SoilMositureEntity mositureEntity = new SoilMositureEntity(new Date().getTime(),new Random().nextDouble()*new Random().nextInt(50));
-				mositureReadings.add(mositureEntity);
-				
-			}
-			
-			
-			
-			sensor.setSoilSensorReadings(mositureReadings);
-			
-			soilMositureSensors.add(sensor);
-		}
-			
-	}
 
 	private void createGoogleMap() {
 		
@@ -93,7 +139,7 @@ public class SoilMoistureView extends VerticalLayout implements View {
         for(SoilMositureSensorEntity sensor:soilMositureSensors) {
         
         //	 System.out.println(sensor.getSensorName()+" "+sensor.getLatLon().getLat()+" "+sensor.getLatLon().getLon());
-        	 GoogleMapMarker gMapMarker = new GoogleMapMarker(sensor.getSensorName(), new LatLon(sensor.getLatLon().getLat(),sensor.getLatLon().getLon()), true);
+        	 GoogleMapMarker gMapMarker = new GoogleMapMarker(sensor.getSensorName(), new LatLon(sensor.getLat(),sensor.getLon()), true);
              googleMap.addMarker(gMapMarker);
              
         }

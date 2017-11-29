@@ -11,7 +11,7 @@ public class TemperatureEntity extends AbstractFirebaseEntity {
 	public static final String TIME="time";
 	public static final String TEMP="temp";
 	public static final String HEADER_TIME=StringHelper.TIME;
-	public static final String HEADER_TEMP=StringHelper.TEMP;
+	public static final String HEADER_TEMP=StringHelper.TEMPERATURE;
 	
 
 	double temp;

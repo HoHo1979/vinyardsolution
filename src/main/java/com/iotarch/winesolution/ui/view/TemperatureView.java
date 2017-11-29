@@ -102,7 +102,7 @@ public class TemperatureView extends VerticalLayout implements View, ValueEventL
 		
 		temperatureChart.setTimeline(true);
 		
-		conf.setTitle(StringHelper.TEMP);
+		conf.setTitle(StringHelper.TEMPERATURE);
 		conf.setSubTitle(StringHelper.TEMPERATURE_CHART_SUBTITLE);
 		conf.getNavigator().setEnabled(false);
 		
