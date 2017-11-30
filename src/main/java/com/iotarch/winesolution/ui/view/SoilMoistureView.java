@@ -91,12 +91,14 @@ public class SoilMoistureView extends VerticalLayout implements View {
 				
 				if(event.getMouseEventDetails().isDoubleClick()) {
 					
+					
 					//remove Item from the database
 					System.out.println(soilMositureSensorEntity.getKey());
 					
 				}else {
 					
 					String key=soilMositureSensorEntity.getKey();
+					soilMositureSensorEntity.setKey(key);
 					soilMositureBinder.setBean(soilMositureSensorEntity);
 					
 				}

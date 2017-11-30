@@ -8,7 +8,7 @@ public class SoilMositureSensorEntity extends AbstractFirebaseEntity {
 	
 	String sensorName;
 	
-	SensorTypeEnum sensorType;
+	SensorTypeEnum sensorType=SensorTypeEnum.SOIL_MOISTURE;
 	
 	double lat;
 	

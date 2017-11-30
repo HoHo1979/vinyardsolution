@@ -1,5 +1,11 @@
 package com.iotarch.winesolution.component;
 
+import java.util.HashMap;
+
+import com.google.api.core.ApiFuture;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.tasks.OnCompleteListener;
+import com.iotarch.winesolution.FirebaseConfiguration;
 import com.iotarch.winesolution.entity.SensorTypeEnum;
 import com.iotarch.winesolution.entity.SoilMositureSensorEntity;
 import com.iotarch.winesolution.helper.StringHelper;
@@ -49,7 +55,6 @@ public class MySensorCRUDComponent extends FormLayout{
 		soilMositureBinder = new Binder<>(SoilMositureSensorEntity.class);
 		
 		soilMositureBinder.readBean(this.soilMositureSensorEntity);
-		
 		
 		soilMositureBinder.forField(sensorTypeCombo).withConverter(new Converter<SensorTypeEnum, String>() {
 
@@ -146,13 +151,22 @@ public class MySensorCRUDComponent extends FormLayout{
 		
 		Button addButton = new Button(StringHelper.ADD_SENSOR);
 		
+		addButton.setEnabled(false);
+		
 		addButton.addClickListener(this::addSensor);
 		
 		Button updateButton = new Button(StringHelper.UPDATE_SENSOR);
 		
 		updateButton.addClickListener(this::updateSensor);
 		
-		addComponents(sensorName,sensorTypeCombo,lat,lon,new HorizontalLayout(updateButton,addButton));
+		Button newButton = new Button(StringHelper.NEW);
+		
+		newButton.addClickListener(e->{
+			addButton.setEnabled(true);
+			soilMositureBinder.setBean(new SoilMositureSensorEntity());
+		});
+		
+		addComponents(sensorName,sensorTypeCombo,lat,lon,new HorizontalLayout(updateButton,addButton,newButton));
 		
 		
 	}
@@ -162,8 +176,12 @@ public class MySensorCRUDComponent extends FormLayout{
 		
 		SoilMositureSensorEntity soilMositureSensorEntity = getSensorInfo();
 		
-		System.out.println("Update"+soilMositureSensorEntity.toString());
+		HashMap<String,Object> toUpdate = new HashMap<>();
 		
+		toUpdate.put(soilMositureSensorEntity.getKey(),soilMositureSensorEntity);
+		
+		FirebaseConfiguration.getFirebaseDB().child("Sensors").updateChildrenAsync(toUpdate);
+	
 		
 	}
 	
@@ -172,17 +190,29 @@ public class MySensorCRUDComponent extends FormLayout{
 		
 		SoilMositureSensorEntity soilMositureSensorEntity = getSensorInfo();
 		
-		System.out.println("Add"+soilMositureSensorEntity.toString());
+		String key=FirebaseConfiguration.getFirebaseDB().child("Sensors").push().getKey();
+			
+		FirebaseConfiguration.getFirebaseDB().child("Sensors").child(key).setValueAsync(soilMositureSensorEntity);
 		
+		event.getButton().setEnabled(false);
 	}
 
 
 	private SoilMositureSensorEntity getSensorInfo() {
+		
 		String sensorName = this.sensorName.getValue();
 		Double lat = Double.valueOf(this.lat.getValue());
 		Double lon = Double.valueOf(this.lon.getValue());
 		
-		SoilMositureSensorEntity soilMositureSensorEntity = new SoilMositureSensorEntity(sensorName,sensorType,lat,lon);
+		SoilMositureSensorEntity soilMositureSensorEntity=soilMositureBinder.getBean();
+		
+		soilMositureSensorEntity.setSensorName(sensorName);
+		soilMositureSensorEntity.setLat(lat);
+		soilMositureSensorEntity.setLon(lon);
+		
+		if(soilMositureSensorEntity.getKey()!=null)
+			System.out.println(soilMositureSensorEntity.getKey());
+
 		return soilMositureSensorEntity;
 	}
 	
