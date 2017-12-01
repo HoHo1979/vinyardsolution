@@ -1,10 +1,10 @@
 package com.iotarch.winesolution.ui.view;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import com.google.firebase.database.DatabaseReference;
 import com.iotarch.winesolution.FirebaseConfiguration;
+import com.iotarch.winesolution.dateprovider.MyFirebaseCRUDDataProvider;
 import com.iotarch.winesolution.dateprovider.MyFirebaseDataProvider;
 import com.iotarch.winesolution.entity.TempHumEntity;
 import com.vaadin.addon.charts.Chart;
@@ -18,7 +18,6 @@ import com.vaadin.addon.charts.model.XAxis;
 import com.vaadin.addon.charts.model.YAxis;
 import com.vaadin.addon.charts.model.style.SolidColor;
 import com.vaadin.board.Board;
-import com.vaadin.data.ValueProvider;
 import com.vaadin.navigator.View;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Grid.Column;
@@ -105,7 +104,7 @@ public class HumidityView extends VerticalLayout implements View{
 		
 		DatabaseReference reference = FirebaseConfiguration.getFirebaseDB().child("MyTemp");
 		
-		humidityProvider = new MyFirebaseDataProvider<>(reference, TempHumEntity.class);
+		humidityProvider = new MyFirebaseDataProvider<TempHumEntity>(reference, TempHumEntity.class);
 		
 		
 		sereis = new DataProviderSeries<>(humidityProvider);

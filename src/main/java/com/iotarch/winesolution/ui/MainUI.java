@@ -1,14 +1,8 @@
 package com.iotarch.winesolution.ui;
 
-import org.vaadin.sliderpanel.SliderPanel;
-import org.vaadin.sliderpanel.SliderPanelBuilder;
-import org.vaadin.sliderpanel.SliderPanelStyles;
-import org.vaadin.sliderpanel.client.SliderMode;
-import org.vaadin.sliderpanel.client.SliderTabPosition;
-
+import com.iotarch.winesolution.ui.view.MainView;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.VerticalLayout;
 
 public class MainUI extends MainUIDesign {
 
@@ -39,11 +33,16 @@ public class MainUI extends MainUIDesign {
 			
 		menuToggle.addClickListener(this::menuToggleClicked);
 		
+		
+		
 //		addComponent(topSliderPanel,0);
 			
 	}
 	
 	public void menuToggleClicked(Event e) {
+		
+		
+		getUI().getCurrent().getNavigator().navigateTo(MainView.NAME);
 		
 //		topSliderPanel.scheduleToggle(1000);
 	
