@@ -53,8 +53,7 @@ public class MyUI extends UI {
 	
 			e1.printStackTrace();
 		}
-    	
-    
+
     	
     	MainUI ui = new MainUI();  
    

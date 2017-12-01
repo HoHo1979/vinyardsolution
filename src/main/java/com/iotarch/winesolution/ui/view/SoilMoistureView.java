@@ -80,6 +80,7 @@ public class SoilMoistureView extends VerticalLayout implements View {
 
 		sensorGrid = new Grid<SoilMositureSensorEntity>(SoilMositureSensorEntity.class);
 		sensorGrid.removeColumn("key");
+		sensorGrid.removeColumn("time");
 		
 		sensorGrid.setSelectionMode(SelectionMode.SINGLE);
 		sensorGrid.addItemClickListener(new ItemClickListener<SoilMositureSensorEntity>() {
@@ -106,9 +107,7 @@ public class SoilMoistureView extends VerticalLayout implements View {
 			}
 		});
 
-		
-		
-		
+
 		sensorGrid.setDataProvider(mySensorFirebaseDataProvier);
 			
 //		sensorReadingGrid = new Grid<SoilMoistureReadingEntity>(SoilMoistureReadingEntity.class);
@@ -117,11 +116,14 @@ public class SoilMoistureView extends VerticalLayout implements View {
 		board = new Board();
 				
 		createGoogleMap();
-		
-		
+
 		board.addRow(googleMap);
 		
-		board.addRow(sensorGrid,mySensorCRUDComponent);
+		VerticalLayout v1 = new VerticalLayout(sensorGrid);
+	
+		v1.setMargin(true);
+
+		board.addRow(v1,mySensorCRUDComponent);
         
 		addComponent(board);
 	}
