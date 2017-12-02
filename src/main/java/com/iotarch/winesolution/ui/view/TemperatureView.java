@@ -4,6 +4,8 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -45,13 +47,12 @@ public class TemperatureView extends VerticalLayout implements View, ValueEventL
 	private static final long serialVersionUID = 1L;
 	public static final String NAME="temperature";	
 	final int maxReading = 30;
-	final String DEGREE  = "\u00b0";
 	Chart currentTemperatureChart;
 	Chart temperatureChart;
 	Board board;
 	Grid<TemperatureEntity> temperatureGrid;
-	List<TemperatureEntity> timeTemperatureList;
-	List<HumidityEntity> timeHumidityList;
+	CopyOnWriteArrayList<TemperatureEntity> timeTemperatureList;
+	CopyOnWriteArrayList<HumidityEntity> timeHumidityList;
 	Grid<HumidityEntity> humidityGrid;
 	Configuration conf;
 	
@@ -64,9 +65,9 @@ public class TemperatureView extends VerticalLayout implements View, ValueEventL
 	
 	public TemperatureView() {
 		
-		timeTemperatureList = new ArrayList<>();
+		timeTemperatureList = new CopyOnWriteArrayList<>();
 		
-		timeHumidityList = new ArrayList<>();
+		timeHumidityList = new CopyOnWriteArrayList<>();
 		
 		humiDataProvider = new ListDataProvider<>(timeHumidityList);
 		

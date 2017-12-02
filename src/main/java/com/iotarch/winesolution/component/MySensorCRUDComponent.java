@@ -2,9 +2,10 @@ package com.iotarch.winesolution.component;
 
 import java.util.HashMap;
 
-import com.google.api.core.ApiFuture;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.tasks.OnCompleteListener;
+import org.vaadin.viritin.button.MButton;
+import org.vaadin.viritin.layouts.MCssLayout;
+import org.vaadin.viritin.layouts.MHorizontalLayout;
+
 import com.iotarch.winesolution.FirebaseConfiguration;
 import com.iotarch.winesolution.entity.SensorTypeEnum;
 import com.iotarch.winesolution.entity.SoilMositureSensorEntity;
@@ -16,14 +17,15 @@ import com.vaadin.data.HasValue.ValueChangeListener;
 import com.vaadin.data.Result;
 import com.vaadin.data.ValueContext;
 import com.vaadin.data.converter.StringToDoubleConverter;
-import com.vaadin.shared.ui.MarginInfo;
+import com.vaadin.icons.VaadinIcons;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.FormLayout;
-import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.ItemCaptionGenerator;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.themes.ValoTheme;
 
 public class MySensorCRUDComponent extends FormLayout{
 
@@ -149,15 +151,17 @@ public class MySensorCRUDComponent extends FormLayout{
 		
 	
 		
-		Button addButton = new Button(StringHelper.ADD_SENSOR);
+		MButton addButton = new MButton(StringHelper.ADD_SENSOR)
+				.withEnabled(false)
+				.withIcon(VaadinIcons.PLUS)
+				.withListener(this::addSensor);
 		
-		addButton.setEnabled(false);
+
+		MButton updateButton = new MButton(StringHelper.UPDATE_SENSOR)
+				.withEnabled(false)
+				.withIcon(VaadinIcons.ARROW_UP)
+				.withListener(this::updateSensor);
 		
-		addButton.addClickListener(this::addSensor);
-		
-		Button updateButton = new Button(StringHelper.UPDATE_SENSOR);
-		
-		updateButton.addClickListener(this::updateSensor);
 		
 		Button newButton = new Button(StringHelper.NEW);
 		
@@ -166,7 +170,14 @@ public class MySensorCRUDComponent extends FormLayout{
 			soilMositureBinder.setBean(new SoilMositureSensorEntity());
 		});
 		
-		addComponents(sensorName,sensorTypeCombo,lat,lon,new HorizontalLayout(updateButton,addButton,newButton));
+		
+		MCssLayout buttonLayout=
+				new MCssLayout(updateButton,addButton,newButton)
+				.withStyleName(ValoTheme.BUTTON_BORDERLESS)
+				.withStyleName(ValoTheme.BUTTON_ICON_ALIGN_RIGHT);
+	
+		addComponents(sensorName,sensorTypeCombo,lat,lon,buttonLayout);
+		
 		
 		
 	}

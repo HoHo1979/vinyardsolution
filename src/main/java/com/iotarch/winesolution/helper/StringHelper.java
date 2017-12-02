@@ -10,8 +10,8 @@ public class StringHelper {
 	public static final String SENSOR_TYPE = "Sensor Type";
 	public static final String LAT = "Latitude";
 	public static final String LON = "Lontitude";
-	public static final String ADD_SENSOR = "Add Sensor";
-	public static final String UPDATE_SENSOR = "Update Sensor";
+	public static final String ADD_SENSOR = "Add";
+	public static final String UPDATE_SENSOR = "Update";
 	public static final String SENSOR_INFO = "Sensor Information";
 	public static final String SOIL_MOISTURE = "Soil Moisture";
 	public static final String HUMIDITY = "Humidity";

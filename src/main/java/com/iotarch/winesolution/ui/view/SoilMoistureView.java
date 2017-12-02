@@ -3,6 +3,8 @@ package com.iotarch.winesolution.ui.view;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.vaadin.viritin.layouts.MVerticalLayout;
+
 import com.google.firebase.database.DatabaseReference;
 import com.iotarch.winesolution.FirebaseConfiguration;
 import com.iotarch.winesolution.component.MySensorCRUDComponent;
@@ -13,9 +15,11 @@ import com.iotarch.winesolution.entity.SoilMoistureReadingEntity;
 import com.iotarch.winesolution.entity.SoilMositureSensorEntity;
 import com.iotarch.winesolution.helper.GoogleMapAPI;
 import com.vaadin.board.Board;
+import com.vaadin.board.Row;
 import com.vaadin.data.Binder;
 import com.vaadin.data.ValueProvider;
 import com.vaadin.navigator.View;
+import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.tapio.googlemaps.GoogleMap;
 import com.vaadin.tapio.googlemaps.client.LatLon;
 import com.vaadin.tapio.googlemaps.client.overlays.GoogleMapMarker;
@@ -69,6 +73,7 @@ public class SoilMoistureView extends VerticalLayout implements View {
 		
 
 		mySensorCRUDComponent = new MySensorCRUDComponent(new SoilMositureSensorEntity());
+		mySensorCRUDComponent.setMargin(new MarginInfo(false,false,false,true));
 		
 		soilMositureBinder = mySensorCRUDComponent.getSoilMositureBinder();
 		
@@ -81,6 +86,8 @@ public class SoilMoistureView extends VerticalLayout implements View {
 		sensorGrid = new Grid<SoilMositureSensorEntity>(SoilMositureSensorEntity.class);
 		sensorGrid.removeColumn("key");
 		sensorGrid.removeColumn("time");
+		sensorGrid.removeColumn("lat");
+		sensorGrid.removeColumn("lon");
 		
 		sensorGrid.setSelectionMode(SelectionMode.SINGLE);
 		sensorGrid.addItemClickListener(new ItemClickListener<SoilMositureSensorEntity>() {
@@ -117,14 +124,20 @@ public class SoilMoistureView extends VerticalLayout implements View {
 				
 		createGoogleMap();
 
-		board.addRow(googleMap);
+		board.addRow(new MVerticalLayout(googleMap).withMargin(new MarginInfo(false, false, true, false)));
 		
-		VerticalLayout v1 = new VerticalLayout(sensorGrid);
+//		VerticalLayout v1 = new VerticalLayout(sensorGrid);
 	
-		v1.setMargin(true);
+//		v1.setMargin(new MarginInfo(true, false, false, false));
+		
+		sensorGrid.setWidth("400px");
+		sensorGrid.setHeight("300px");
+		mySensorCRUDComponent.setWidth("300px");
 
-		board.addRow(v1,mySensorCRUDComponent);
+		Row row=board.addRow(sensorGrid,mySensorCRUDComponent);
         
+		
+		
 		addComponent(board);
 	}
 
@@ -139,6 +152,7 @@ public class SoilMoistureView extends VerticalLayout implements View {
         googleMap.setZoom(10);
         googleMap.setSizeFull();
         
+       
         
         for(SoilMositureSensorEntity sensor:soilMositureSensors) {
         
