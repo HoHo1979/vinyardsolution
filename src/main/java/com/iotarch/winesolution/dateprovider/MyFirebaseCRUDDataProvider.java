@@ -119,7 +119,7 @@ public class MyFirebaseCRUDDataProvider<T extends AbstractFirebaseEntity> extend
 
 	@Override
 	public void onCancelled(DatabaseError arg0) {
-		// TODO Auto-generated method stub
+		
 		
 	}
 	

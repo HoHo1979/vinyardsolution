@@ -1,8 +1,10 @@
 package com.iotarch.winesolution.entity;
 
+import java.io.Serializable;
+
 import com.iotarch.winesolution.helper.StringHelper;
 
-public class SoilMositureSensorEntity extends AbstractFirebaseEntity {
+public class SoilMositureSensorEntity extends AbstractFirebaseEntity implements Serializable {
 
 	//String sensorKey;String sensorName;SensorTypeEnum sensorType;LatLon latLon;
 	

@@ -1,6 +1,7 @@
 package com.iotarch.winesolution.dateprovider;
 
 import java.util.LinkedHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
@@ -25,6 +26,7 @@ public class MyFirebaseDataProvider<T extends AbstractFirebaseEntity> extends Ab
 	private static final long serialVersionUID = 1981377433979445413L;
 	
 	private LinkedHashMap<String, T> data = new LinkedHashMap<>();
+	private CopyOnWriteArrayList<T> tArrayList = new CopyOnWriteArrayList<>();
 	DatabaseReference reference;
 	Class<T> type;
 	AtomicInteger registeredListeners = new AtomicInteger(0);
@@ -124,16 +126,20 @@ public class MyFirebaseDataProvider<T extends AbstractFirebaseEntity> extends Ab
 	@Override
 	public void onDataChange(DataSnapshot dataSnapshot) {
 		
-		data = new LinkedHashMap<>();
-		
 		dataSnapshot.getChildren().forEach(x->{
 			String key=x.getKey();
 			T added = x.getValue(type);
 			added.setKey(key);
 			
-			data.put(key,added);
+			tArrayList.add(added);
 			
 		});
+		
+		for(T t:tArrayList) {
+		
+			data.put(t.getKey(),t);
+		
+		}
 		
 		refreshAll();
 	}
