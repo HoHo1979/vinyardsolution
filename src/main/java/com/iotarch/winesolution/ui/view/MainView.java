@@ -50,6 +50,7 @@ public class MainView extends VerticalLayout implements View {
 		reportButton = new MButton(StringHelper.REPORT)
 				.withStyleName(ValoTheme.BUTTON_HUGE)
 				.withIcon(VaadinIcons.BAR_CHART_H)
+				.withEnabled(false)
 				.withWidth("100%");
 //				.withListener(e->navigator.navigateTo(SoilMoistureView.NAME));
 		
@@ -57,12 +58,14 @@ public class MainView extends VerticalLayout implements View {
 		settingButton = new MButton(StringHelper.SETTING)
 				.withStyleName(ValoTheme.BUTTON_HUGE)
 				.withIcon(VaadinIcons.COG_O)
+				.withEnabled(false)
 				.withWidth("100%");
 //				.withListener(e->navigator.navigateTo(SoilMoistureView.NAME));
 		
 		logoutButton = new MButton(StringHelper.LOGOUT)
 				.withStyleName(ValoTheme.BUTTON_HUGE)
 				.withIcon(VaadinIcons.SIGN_OUT)
+				.withEnabled(false)
 				.withWidth("100%");
 //				.withListener(e->navigator.navigateTo(SoilMoistureView.NAME));
 		

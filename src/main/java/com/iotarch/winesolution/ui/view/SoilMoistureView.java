@@ -3,6 +3,7 @@ package com.iotarch.winesolution.ui.view;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.omg.CosNaming.NamingContextExtPackage.StringNameHelper;
 import org.vaadin.viritin.layouts.MVerticalLayout;
 
 import com.google.firebase.database.DatabaseReference;
@@ -24,6 +25,7 @@ import com.vaadin.tapio.googlemaps.GoogleMap;
 import com.vaadin.tapio.googlemaps.client.LatLon;
 import com.vaadin.tapio.googlemaps.client.overlays.GoogleMapMarker;
 import com.vaadin.ui.Grid;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Grid.ItemClick;
 import com.vaadin.ui.Grid.SelectionMode;
@@ -64,16 +66,9 @@ public class SoilMoistureView extends VerticalLayout implements View {
 	public SoilMoistureView() {
 		
 		
-		//Sensor Readings from Firebase
-//		soilMoistureReadings = new CopyOnWriteArrayList<SoilMoistureReadingEntity>();
-//		
-//		DatabaseReference sensorDataReference=FirebaseConfiguration.getFirebaseDB().child("SoilMoisture").child("key");
-//		
-//		mySensorReadingFirebaseDataProvider = new MyFirebaseDataProvider<>(sensorDataReference,SoilMoistureReadingEntity.class);
-		
 
 		mySensorCRUDComponent = new MySensorCRUDComponent(new SoilMositureSensorEntity());
-		mySensorCRUDComponent.setMargin(new MarginInfo(false,false,false,true));
+		mySensorCRUDComponent.setMargin(new MarginInfo(false,false,true,true));
 		
 		soilMositureBinder = mySensorCRUDComponent.getSoilMositureBinder();
 		
@@ -105,14 +100,22 @@ public class SoilMoistureView extends VerticalLayout implements View {
 					
 				}else {
 					
-					String key=soilMositureSensorEntity.getKey();
+					String key=event.getItem().getKey();
 					soilMositureSensorEntity.setKey(key);
+					updateSensorReadingGrid(key);
 					soilMositureBinder.setBean(soilMositureSensorEntity);
 					
 				}
 				
 			}
 		});
+		
+		sensorReadingGrid = new Grid<SoilMoistureReadingEntity>();
+
+		sensorReadingGrid.addColumn(SoilMoistureReadingEntity::getMoisture)
+						 .setCaption("Reading");	
+		sensorReadingGrid.addColumn(SoilMoistureReadingEntity::getStatus).setCaption("Status");
+		sensorReadingGrid.addColumn(SoilMoistureReadingEntity::getDate).setCaption("Time");
 
 
 		sensorGrid.setDataProvider(mySensorFirebaseDataProvier);
@@ -135,10 +138,30 @@ public class SoilMoistureView extends VerticalLayout implements View {
 		mySensorCRUDComponent.setWidth("300px");
 
 		Row row=board.addRow(sensorGrid,mySensorCRUDComponent);
+		
+		sensorReadingGrid.setWidth("400px");
+		sensorReadingGrid.setHeight("300px");
+		
+		board.addRow(sensorReadingGrid);
         
-		
-		
 		addComponent(board);
+	}
+
+
+	public void updateSensorReadingGrid(String key) {
+		
+		if(key!=null) {
+		
+		DatabaseReference sensorDataReference=FirebaseConfiguration.getFirebaseDB().child("SoilMoisture").child(key);
+		
+		mySensorReadingFirebaseDataProvider = new MyFirebaseDataProvider<>(sensorDataReference,SoilMoistureReadingEntity.class);
+	
+		sensorReadingGrid.setDataProvider(mySensorReadingFirebaseDataProvider);
+
+		
+		}
+		
+		
 	}
 
 
@@ -153,6 +176,8 @@ public class SoilMoistureView extends VerticalLayout implements View {
         googleMap.setSizeFull();
         
        
+        
+        
         
         for(SoilMositureSensorEntity sensor:soilMositureSensors) {
         
