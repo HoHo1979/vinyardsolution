@@ -8,8 +8,6 @@ public class SoilMositureSensorEntity extends AbstractFirebaseEntity implements 
 
 	//String sensorKey;String sensorName;SensorTypeEnum sensorType;LatLon latLon;
 	
-	String sensorName;
-	
 	SensorTypeEnum sensorType=SensorTypeEnum.SOIL_MOISTURE;
 	
 	double lat;
@@ -34,24 +32,12 @@ public class SoilMositureSensorEntity extends AbstractFirebaseEntity implements 
 
 
 	public SoilMositureSensorEntity(String sensorName, SensorTypeEnum sensorType, double lat, double lon) {
-		super();
-		this.sensorName = sensorName;
+		super(sensorName);
 		this.sensorType = sensorType;
 		this.lat = lat;
 		this.lon = lon;
 	}
 
-
-
-
-	public String getSensorName() {
-		return sensorName;
-	}
-
-
-	public void setSensorName(String sensorName) {
-		this.sensorName = sensorName;
-	}
 
 
 	public String getSensorType() {

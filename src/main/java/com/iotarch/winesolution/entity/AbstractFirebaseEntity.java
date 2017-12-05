@@ -8,6 +8,17 @@ public abstract class AbstractFirebaseEntity {
 	String key;
 	
 	Long time;
+	
+	String sensorName;
+	
+	public AbstractFirebaseEntity() {
+		
+	}
+	
+	public AbstractFirebaseEntity(String sensorName) {
+		this.sensorName=sensorName;
+	}
+	
 
 	public String getKey() {
 		return key;
@@ -24,6 +35,15 @@ public abstract class AbstractFirebaseEntity {
 	public void setTime(Long time) {
 		this.time = time;
 	}
+
+	public String getSensorName() {
+		return sensorName;
+	}
+
+	public void setSensorName(String sensorName) {
+		this.sensorName = sensorName;
+	}
+	
 	
 	
 	

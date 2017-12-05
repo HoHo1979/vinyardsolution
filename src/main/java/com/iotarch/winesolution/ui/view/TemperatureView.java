@@ -1,9 +1,6 @@
 package com.iotarch.winesolution.ui.view;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.google.firebase.database.DataSnapshot;
@@ -11,7 +8,10 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.iotarch.winesolution.FirebaseConfiguration;
+import com.iotarch.winesolution.dateprovider.MyFirebaseCRUDDataProvider;
 import com.iotarch.winesolution.entity.HumidityEntity;
+import com.iotarch.winesolution.entity.SensorTypeEnum;
+import com.iotarch.winesolution.entity.SoilMositureSensorEntity;
 import com.iotarch.winesolution.entity.TempHumEntity;
 import com.iotarch.winesolution.entity.TemperatureEntity;
 import com.iotarch.winesolution.helper.StringHelper;
@@ -26,16 +26,18 @@ import com.vaadin.addon.charts.model.ListSeries;
 import com.vaadin.addon.charts.model.PlotBand;
 import com.vaadin.addon.charts.model.PlotOptionsColumn;
 import com.vaadin.addon.charts.model.PlotOptionsLine;
-import com.vaadin.addon.charts.model.RangeSelector;
 import com.vaadin.addon.charts.model.YAxis;
 import com.vaadin.addon.charts.model.style.SolidColor;
 import com.vaadin.addon.charts.model.style.Style;
 import com.vaadin.board.Board;
-import com.vaadin.data.provider.DataProvider;
+import com.vaadin.data.HasValue.ValueChangeEvent;
+import com.vaadin.data.HasValue.ValueChangeListener;
 import com.vaadin.data.provider.ListDataProvider;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewBeforeLeaveEvent;
+import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Grid;
+import com.vaadin.ui.ItemCaptionGenerator;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.renderers.NumberRenderer;
 
@@ -56,8 +58,11 @@ public class TemperatureView extends VerticalLayout implements View, ValueEventL
 	Grid<HumidityEntity> humidityGrid;
 	Configuration conf;
 	
+	
 	ListDataProvider<TemperatureEntity> tempDataProvider;
 	ListDataProvider<HumidityEntity> humiDataProvider;
+	
+	MyFirebaseCRUDDataProvider<SoilMositureSensorEntity> sensorProvider;
 
 	ListSeries gaugeSeries = new ListSeries("Temperature",0);
 	
@@ -87,17 +92,98 @@ public class TemperatureView extends VerticalLayout implements View, ValueEventL
 		
 		temperatureChart.drawChart(conf);
 		
+		ComboBox<SoilMositureSensorEntity> mySensorCombo = createSensorComboBox();
+		
+		
+		board.addRow(mySensorCombo);
+		
 		board.addRow(currentTemperatureChart,temperatureChart);
 		
 		board.addRow(temperatureGrid);
 
+		
+		
 		addComponent(board);
+	}
+
+	private ComboBox<SoilMositureSensorEntity> createSensorComboBox() {
+		
+		ComboBox<SoilMositureSensorEntity> mySensorCombo = new ComboBox<>();
+		
+		
+		mySensorCombo.setItemCaptionGenerator(new ItemCaptionGenerator<SoilMositureSensorEntity>() {
+			
+			@Override
+			public String apply(SoilMositureSensorEntity item) {
+				
+				return item.getSensorName();
+			}
+		});
+		
+		DatabaseReference reference = FirebaseConfiguration.getFirebaseDB().child("Sensors");
+		
+		CopyOnWriteArrayList<SoilMositureSensorEntity> items = new CopyOnWriteArrayList<>();
+		
+		ListDataProvider<SoilMositureSensorEntity> listDataProvider = new ListDataProvider<>(items);
+		
+		mySensorCombo.setDataProvider(listDataProvider);
+		
+		mySensorCombo.addValueChangeListener(new ValueChangeListener<SoilMositureSensorEntity>() {
+			
+			@Override
+			public void valueChange(ValueChangeEvent<SoilMositureSensorEntity> event) {
+				
+				System.out.println(event.getValue().getKey());
+				
+			}
+		});
+		
+		reference.addListenerForSingleValueEvent(new ValueEventListener() {
+			
+			@Override
+			public void onDataChange(DataSnapshot dataSnapshot) {
+				
+				dataSnapshot.getChildren().forEach(x->{
+					
+					
+					SoilMositureSensorEntity entity=x.getValue(SoilMositureSensorEntity.class);
+					
+					if(entity.getSensorType().equals(StringHelper.TEMPERATURE)) {
+					
+						entity.setKey(x.getKey());
+					
+						items.add(entity);
+					}
+					
+				});
+				
+				
+				getUI().access(new Runnable() {
+					
+					@Override
+					public void run() {
+						
+						listDataProvider.refreshAll();
+					}
+				});
+				
+			}
+			
+			@Override
+			public void onCancelled(DatabaseError arg0) {
+				
+				
+			}
+		});
+		return mySensorCombo;
 	}
 
 	private void initTemperatureChart() {
 		
 		temperatureChart = new Chart();
-	
+		
+		temperatureChart.setWidth("400px");
+		
 		conf = temperatureChart.getConfiguration();
 		
 		
@@ -105,11 +191,6 @@ public class TemperatureView extends VerticalLayout implements View, ValueEventL
 		
 		conf.setTitle(StringHelper.TEMPERATURE);
 		conf.setSubTitle(StringHelper.TEMPERATURE_CHART_SUBTITLE);
-		conf.getNavigator().setEnabled(false);
-		
-		RangeSelector rangeSelector = new RangeSelector();
-		rangeSelector.setSelected(1);
-		conf.setRangeSelector(rangeSelector);
 		
 		conf.getxAxis().setType(AxisType.DATETIME);
 	}
@@ -200,18 +281,31 @@ public class TemperatureView extends VerticalLayout implements View, ValueEventL
         
         conf.addyAxis(y);
 		
+        conf.getNavigator().getSeries().setColor(SolidColor.ROSYBROWN);
+        conf.getNavigator().setMargin(50);
        
         DataProviderSeries<TemperatureEntity> series = new DataProviderSeries<>(tempDataProvider,TemperatureEntity::getTemp);
 
 		series.setName("Temperature");
 		series.setX(TemperatureEntity::getTime);
-
+		
 		PlotOptionsLine line = new PlotOptionsLine();
 	    line.setColor(SolidColor.BROWN);
-	        	
+
 		series.setPlotOptions(line);
-		
-		
+			
+//		RangeSelector rangeSelector = new RangeSelector();	
+//		RangeSelectorButton dayButton = new RangeSelectorButton(RangeSelectorTimespan.DAY, "1d");
+//		RangeSelectorButton monthButton = new RangeSelectorButton(RangeSelectorTimespan.MONTH,"1m");		
+//		rangeSelector.setButtons(dayButton,monthButton);
+//		rangeSelector.setSelected(1);
+//		ButtonTheme theme = new ButtonTheme();
+//		Style sty = new Style();
+//		sty.setColor(new SolidColor("#0766d8"));
+//		sty.setFontWeight(FontWeight.BOLD);
+//		theme.setStyle(style);
+//		rangeSelector.setButtonTheme(theme);	
+//		conf.setRangeSelector(rangeSelector);
 		
 		DatabaseReference reference = FirebaseConfiguration.getFirebaseDB().child("MyTemp");
 		
@@ -226,6 +320,8 @@ public class TemperatureView extends VerticalLayout implements View, ValueEventL
 	private void createCurrentTemperatureChart() {
 		
 		currentTemperatureChart = new Chart(ChartType.GAUGE);
+		
+		currentTemperatureChart.setWidth("300px");
 		
 		Configuration conf = currentTemperatureChart.getConfiguration();
 		conf.setTitle(StringHelper.CURRENT_TEMPERATURE);
