@@ -1,10 +1,12 @@
 package com.iotarch.winesolution.entity;
 
+import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
 
 @IgnoreExtraProperties
 public abstract class AbstractFirebaseEntity {
 	
+	@Exclude
 	String key;
 	
 	Long time;
@@ -15,15 +17,12 @@ public abstract class AbstractFirebaseEntity {
 		
 	}
 	
-	public AbstractFirebaseEntity(String sensorName) {
-		this.sensorName=sensorName;
-	}
-	
 
 	public String getKey() {
 		return key;
 	}
 
+	@Exclude
 	public void setKey(String key) {
 		this.key = key;
 	}
@@ -36,13 +35,6 @@ public abstract class AbstractFirebaseEntity {
 		this.time = time;
 	}
 
-	public String getSensorName() {
-		return sensorName;
-	}
-
-	public void setSensorName(String sensorName) {
-		this.sensorName = sensorName;
-	}
 	
 	
 	

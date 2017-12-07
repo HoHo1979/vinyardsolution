@@ -83,6 +83,7 @@ public class SoilMoistureView extends VerticalLayout implements View {
 		sensorGrid.removeColumn("time");
 		sensorGrid.removeColumn("lat");
 		sensorGrid.removeColumn("lon");
+		sensorGrid.removeColumn("sTypeEnum");
 		
 		sensorGrid.setSelectionMode(SelectionMode.SINGLE);
 		sensorGrid.addItemClickListener(new ItemClickListener<SoilMositureSensorEntity>() {

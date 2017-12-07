@@ -2,10 +2,15 @@ package com.iotarch.winesolution.ui.view;
 
 import java.util.Date;
 
+import org.vaadin.viritin.button.MButton;
+
 import com.google.firebase.database.DatabaseReference;
 import com.iotarch.winesolution.FirebaseConfiguration;
+import com.iotarch.winesolution.component.MySensorComboBox;
 import com.iotarch.winesolution.dateprovider.MyFirebaseCRUDDataProvider;
 import com.iotarch.winesolution.dateprovider.MyFirebaseDataProvider;
+import com.iotarch.winesolution.entity.SensorTypeEnum;
+import com.iotarch.winesolution.entity.SoilMositureSensorEntity;
 import com.iotarch.winesolution.entity.TempHumEntity;
 import com.vaadin.addon.charts.Chart;
 import com.vaadin.addon.charts.model.AxisType;
@@ -18,9 +23,13 @@ import com.vaadin.addon.charts.model.XAxis;
 import com.vaadin.addon.charts.model.YAxis;
 import com.vaadin.addon.charts.model.style.SolidColor;
 import com.vaadin.board.Board;
+import com.vaadin.data.HasValue.ValueChangeEvent;
+import com.vaadin.data.HasValue.ValueChangeListener;
 import com.vaadin.navigator.View;
 import com.vaadin.ui.Grid;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.Grid.Column;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.renderers.TextRenderer;
 
@@ -44,8 +53,30 @@ public class HumidityView extends VerticalLayout implements View{
 	
 	Grid<TempHumEntity> tempHumGrid;
 	
+	MySensorComboBox<SoilMositureSensorEntity> sensorComboBox; 
+	
 	
 	public HumidityView() {
+		
+		
+		DatabaseReference ref=FirebaseConfiguration.getFirebaseDB().child("Sensors");
+		
+		sensorComboBox = new MySensorComboBox<>(ref,SoilMositureSensorEntity.class,SensorTypeEnum.HUMIDITY);
+		
+		sensorComboBox.setItemCaptionGenerator();
+		
+		sensorComboBox.setDataProvider();
+		
+		sensorComboBox.addValueChangeListener(new ValueChangeListener<SoilMositureSensorEntity>() {
+			
+			@Override
+			public void valueChange(ValueChangeEvent<SoilMositureSensorEntity> event) {
+				
+				Notification.show(event.getValue().getSensorName());
+				System.out.println(event.getValue().getSensorType());
+			}
+		});
+		
 		
 		tempHumGrid = new Grid<>(TempHumEntity.class);
 		
@@ -63,6 +94,7 @@ public class HumidityView extends VerticalLayout implements View{
 		
 		tempHumGrid.setDataProvider(humidityProvider);
 		
+		board.addRow(sensorComboBox);
 		
 		board.addRow(humidityCart);
 		

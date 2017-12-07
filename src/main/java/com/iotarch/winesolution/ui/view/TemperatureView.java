@@ -133,7 +133,7 @@ public class TemperatureView extends VerticalLayout implements View, ValueEventL
 			@Override
 			public void valueChange(ValueChangeEvent<SoilMositureSensorEntity> event) {
 				
-				System.out.println(event.getValue().getKey());
+				
 				
 			}
 		});

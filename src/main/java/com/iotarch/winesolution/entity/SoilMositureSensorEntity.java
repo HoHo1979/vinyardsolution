@@ -2,73 +2,68 @@ package com.iotarch.winesolution.entity;
 
 import java.io.Serializable;
 
+import com.google.firebase.database.Exclude;
 import com.iotarch.winesolution.helper.StringHelper;
 
-public class SoilMositureSensorEntity extends AbstractFirebaseEntity implements Serializable {
+public class SoilMositureSensorEntity extends AbstractFirebaseSensorEntity implements Serializable {
 
 	//String sensorKey;String sensorName;SensorTypeEnum sensorType;LatLon latLon;
 	
-	SensorTypeEnum sensorType=SensorTypeEnum.SOIL_MOISTURE;
 	
 	double lat;
 	
 	double lon;
 	
+	String sensorType;
 
 	public SoilMositureSensorEntity() {
 	
 	}
 	
-	
 
-
-	@Override
-	public String toString() {
-		return "SoilMositureSensorEntity [sensorName=" + sensorName + ", sensorType=" + sensorType.name() + ", lat=" + lat
-				+ ", lon=" + lon + "]";
-	}
-
-
-
-
-	public SoilMositureSensorEntity(String sensorName, SensorTypeEnum sensorType, double lat, double lon) {
-		super(sensorName);
-		this.sensorType = sensorType;
+	public SoilMositureSensorEntity(String sensorName, SensorTypeEnum sTypeEnum, double lat, double lon) {
+		super(sensorName,sTypeEnum);
 		this.lat = lat;
 		this.lon = lon;
 	}
 
 
-
 	public String getSensorType() {
 		
-		switch (sensorType) {
-		case SOIL_MOISTURE:
-			return StringHelper.SOIL_MOISTURE;
+		switch (sTypeEnum) {
 		case TEMPERATURE:
 			return StringHelper.TEMPERATURE;
 		case HUMIDITY:
 			return StringHelper.HUMIDITY;
+		case SOIL_MOISTURE:
+			return StringHelper.SOIL_MOISTURE;		
 		default:
 			return StringHelper.SOIL_MOISTURE;
-		}	
-
+		}
+			
 	}
 
 
-	public void setSensorType(String st) {
+	public void setSensorType(String sensorType) {
 		
-		if(st.equals(StringHelper.HUMIDITY)) {
-			sensorType = SensorTypeEnum.HUMIDITY;
-		}else if(st.equals(StringHelper.SOIL_MOISTURE)) {
-			sensorType = SensorTypeEnum.SOIL_MOISTURE;
-		}else if(st.equals(StringHelper.TEMPERATURE)){
-			sensorType = SensorTypeEnum.TEMPERATURE;
-		}else {
-			sensorType=SensorTypeEnum.SOIL_MOISTURE;
+		switch (sensorType) {
+		case StringHelper.TEMPERATURE:
+			setsTypeEnum(SensorTypeEnum.TEMPERATURE);
+			break;
+			
+		case StringHelper.SOIL_MOISTURE:
+			setsTypeEnum(SensorTypeEnum.SOIL_MOISTURE);
+			break;
+			
+		case StringHelper.HUMIDITY:
+			setsTypeEnum(SensorTypeEnum.HUMIDITY);
+			break;
+
+		default:
+			setsTypeEnum(SensorTypeEnum.SOIL_MOISTURE);
+			break;
 		}
-		
-		
+
 	}
 
 
@@ -90,6 +85,10 @@ public class SoilMositureSensorEntity extends AbstractFirebaseEntity implements 
 	public void setLon(double lon) {
 		this.lon = lon;
 	}
+
+
+	
+	
 
 	
 	

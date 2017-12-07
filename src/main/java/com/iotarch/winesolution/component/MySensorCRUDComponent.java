@@ -18,6 +18,7 @@ import com.vaadin.data.Result;
 import com.vaadin.data.ValueContext;
 import com.vaadin.data.converter.StringToDoubleConverter;
 import com.vaadin.icons.VaadinIcons;
+import com.vaadin.sass.internal.tree.ReturnNode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -58,64 +59,9 @@ public class MySensorCRUDComponent extends FormLayout{
 		
 		soilMositureBinder.readBean(this.soilMositureSensorEntity);
 		
-		soilMositureBinder.forField(sensorTypeCombo).withConverter(new Converter<SensorTypeEnum, String>() {
-
-			@Override
-			public Result<String> convertToModel(SensorTypeEnum value, ValueContext context) {
-		
-				String type=context.toString();
-				
-				switch (value) {
-				case SOIL_MOISTURE:
-					
-					type=StringHelper.SOIL_MOISTURE;
-					break;
-					
-				case TEMPERATURE:
-					type=StringHelper.TEMPERATURE;
-					break;
-
-				case HUMIDITY:
-					type=StringHelper.HUMIDITY;
-					break;
-					
-				default:
-					type=StringHelper.SOIL_MOISTURE;
-					break;
-				}
-				
-				return Result.ok(type);
-			}
-
-			@Override
-			public SensorTypeEnum convertToPresentation(String value, ValueContext context) {
-				
-				SensorTypeEnum sensorTypeEnum=SensorTypeEnum.SOIL_MOISTURE;
-				
-				switch (value) {
-				case StringHelper.SOIL_MOISTURE:
-					
-					sensorTypeEnum = SensorTypeEnum.SOIL_MOISTURE;
-					break;
-					
-				case StringHelper.TEMPERATURE:
-					
-					sensorTypeEnum = SensorTypeEnum.TEMPERATURE;
-					break;	
-
-				case StringHelper.HUMIDITY:
-					
-					sensorTypeEnum = SensorTypeEnum.HUMIDITY;	
-					break;
-				default:
-					sensorTypeEnum = SensorTypeEnum.SOIL_MOISTURE;
-					break;
-				}
-				
-				return sensorTypeEnum;
-			}
-		}).bind(SoilMositureSensorEntity::getSensorType,SoilMositureSensorEntity::setSensorType);
-		
+		soilMositureBinder.forField(sensorTypeCombo)
+		.bind(SoilMositureSensorEntity::getsTypeEnum,SoilMositureSensorEntity::setsTypeEnum);
+			
 		soilMositureBinder.forField(lat).withConverter(new StringToDoubleConverter("Cannot Covert Lat"))
 			.bind(SoilMositureSensorEntity::getLat,SoilMositureSensorEntity::setLat);
 		soilMositureBinder.forField(lon).withConverter(new StringToDoubleConverter("Cannot Covert Lon"))
@@ -158,7 +104,7 @@ public class MySensorCRUDComponent extends FormLayout{
 		
 
 		MButton updateButton = new MButton(StringHelper.UPDATE_SENSOR)
-				.withEnabled(false)
+				.withEnabled(true)
 				.withIcon(VaadinIcons.ARROW_UP)
 				.withListener(this::updateSensor);
 		
