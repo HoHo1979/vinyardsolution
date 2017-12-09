@@ -1,6 +1,7 @@
 package com.iotarch.winesolution.ui.view;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.omg.CosNaming.NamingContextExtPackage.StringNameHelper;
@@ -30,6 +31,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Grid.ItemClick;
 import com.vaadin.ui.Grid.SelectionMode;
 import com.vaadin.ui.components.grid.ItemClickListener;
+import com.vaadin.ui.renderers.DateRenderer;
 import com.vaadin.ui.renderers.Renderer;
 
 public class SoilMoistureView extends VerticalLayout implements View {
@@ -117,8 +119,7 @@ public class SoilMoistureView extends VerticalLayout implements View {
 						 .setCaption("Reading");	
 		sensorReadingGrid.addColumn(SoilMoistureReadingEntity::getStatus).setCaption("Status");
 		sensorReadingGrid.addColumn(SoilMoistureReadingEntity::getDate).setCaption("Time");
-
-
+		
 		sensorGrid.setDataProvider(mySensorFirebaseDataProvier);
 			
 //		sensorReadingGrid = new Grid<SoilMoistureReadingEntity>(SoilMoistureReadingEntity.class);

@@ -1,6 +1,8 @@
 package com.iotarch.winesolution.ui.view;
 
 import java.text.DecimalFormat;
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.google.firebase.database.DataSnapshot;
@@ -10,10 +12,12 @@ import com.google.firebase.database.ValueEventListener;
 import com.iotarch.winesolution.FirebaseConfiguration;
 import com.iotarch.winesolution.dateprovider.MyFirebaseCRUDDataProvider;
 import com.iotarch.winesolution.entity.HumidityEntity;
+import com.iotarch.winesolution.entity.MyDateRenderer;
 import com.iotarch.winesolution.entity.SensorTypeEnum;
 import com.iotarch.winesolution.entity.SoilMositureSensorEntity;
 import com.iotarch.winesolution.entity.TempHumEntity;
 import com.iotarch.winesolution.entity.TemperatureEntity;
+import com.iotarch.winesolution.helper.FirebaseRefHelper;
 import com.iotarch.winesolution.helper.StringHelper;
 import com.vaadin.addon.charts.Chart;
 import com.vaadin.addon.charts.model.AxisTitle;
@@ -30,16 +34,22 @@ import com.vaadin.addon.charts.model.YAxis;
 import com.vaadin.addon.charts.model.style.SolidColor;
 import com.vaadin.addon.charts.model.style.Style;
 import com.vaadin.board.Board;
+import com.vaadin.data.Converter;
 import com.vaadin.data.HasValue.ValueChangeEvent;
 import com.vaadin.data.HasValue.ValueChangeListener;
+import com.vaadin.data.Result;
+import com.vaadin.data.ValueContext;
 import com.vaadin.data.provider.ListDataProvider;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewBeforeLeaveEvent;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Grid;
+import com.vaadin.ui.Grid.Column;
 import com.vaadin.ui.ItemCaptionGenerator;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.renderers.DateRenderer;
 import com.vaadin.ui.renderers.NumberRenderer;
+import com.vaadin.ui.renderers.Renderer;
 
 public class TemperatureView extends VerticalLayout implements View, ValueEventListener{
 	
@@ -57,7 +67,7 @@ public class TemperatureView extends VerticalLayout implements View, ValueEventL
 	CopyOnWriteArrayList<HumidityEntity> timeHumidityList;
 	Grid<HumidityEntity> humidityGrid;
 	Configuration conf;
-	
+
 	
 	ListDataProvider<TemperatureEntity> tempDataProvider;
 	ListDataProvider<HumidityEntity> humiDataProvider;
@@ -67,6 +77,8 @@ public class TemperatureView extends VerticalLayout implements View, ValueEventL
 	ListSeries gaugeSeries = new ListSeries("Temperature",0);
 	
 	double currentTemperature;
+	
+	String temperatureKey;
 	
 	public TemperatureView() {
 		
@@ -110,6 +122,9 @@ public class TemperatureView extends VerticalLayout implements View, ValueEventL
 		
 		ComboBox<SoilMositureSensorEntity> mySensorCombo = new ComboBox<>();
 		
+		mySensorCombo.setCaption("Sensors");
+		
+		mySensorCombo.setDescription("Select Sensor to Get Temperature and Humidity");
 		
 		mySensorCombo.setItemCaptionGenerator(new ItemCaptionGenerator<SoilMositureSensorEntity>() {
 			
@@ -117,6 +132,8 @@ public class TemperatureView extends VerticalLayout implements View, ValueEventL
 			public String apply(SoilMositureSensorEntity item) {
 				
 				return item.getSensorName();
+				
+				
 			}
 		});
 		
@@ -133,8 +150,8 @@ public class TemperatureView extends VerticalLayout implements View, ValueEventL
 			@Override
 			public void valueChange(ValueChangeEvent<SoilMositureSensorEntity> event) {
 				
-				
-				
+				temperatureKey=event.getValue().getKey();
+				createTemperatureChart();
 			}
 		});
 		
@@ -248,13 +265,13 @@ public class TemperatureView extends VerticalLayout implements View, ValueEventL
 		
 		temperatureGrid.setWidth("100%");
 	
-		temperatureGrid.addColumn(x->x.getDate()).setCaption(TemperatureEntity.HEADER_TIME);
+		temperatureGrid.addColumn(TemperatureEntity::getDate).setCaption(TemperatureEntity.HEADER_TIME);
 		temperatureGrid
-			.addColumn(x->x.getTemp(),new NumberRenderer(new DecimalFormat("##.## '°C'")))
+			.addColumn(TemperatureEntity::getTemp,new NumberRenderer(new DecimalFormat("##.## '°C'")))
 			.setCaption(TemperatureEntity.HEADER_TEMP);
+
 		
-			
-	
+		
 		temperatureGrid.setDataProvider(tempDataProvider);
 	
 		
@@ -263,7 +280,8 @@ public class TemperatureView extends VerticalLayout implements View, ValueEventL
 
 	private void createTemperatureChart() {
 		
-	
+		if(temperatureKey!=null) {
+
 		YAxis y = new YAxis();
 		
 		AxisTitle title = new AxisTitle("Temperature");
@@ -277,8 +295,7 @@ public class TemperatureView extends VerticalLayout implements View, ValueEventL
         labels.setStyle(style);
         y.setLabels(labels);	
         y.setOpposite(true);
-        
-        
+         
         conf.addyAxis(y);
 		
         conf.getNavigator().getSeries().setColor(SolidColor.ROSYBROWN);
@@ -294,25 +311,17 @@ public class TemperatureView extends VerticalLayout implements View, ValueEventL
 
 		series.setPlotOptions(line);
 			
-//		RangeSelector rangeSelector = new RangeSelector();	
-//		RangeSelectorButton dayButton = new RangeSelectorButton(RangeSelectorTimespan.DAY, "1d");
-//		RangeSelectorButton monthButton = new RangeSelectorButton(RangeSelectorTimespan.MONTH,"1m");		
-//		rangeSelector.setButtons(dayButton,monthButton);
-//		rangeSelector.setSelected(1);
-//		ButtonTheme theme = new ButtonTheme();
-//		Style sty = new Style();
-//		sty.setColor(new SolidColor("#0766d8"));
-//		sty.setFontWeight(FontWeight.BOLD);
-//		theme.setStyle(style);
-//		rangeSelector.setButtonTheme(theme);	
-//		conf.setRangeSelector(rangeSelector);
-		
-		DatabaseReference reference = FirebaseConfiguration.getFirebaseDB().child("MyTemp");
-		
-		reference.addValueEventListener(this);
-		
+		DatabaseReference reference;
 
-	    conf.addSeries(series);
+		reference = FirebaseConfiguration.getFirebaseDB().child(FirebaseRefHelper.REF_TEMPERATURE).child(temperatureKey);
+			
+		reference.addValueEventListener(this);
+			
+		
+		conf.addSeries(series);
+		}
+
+	    
 
 	}
 
@@ -383,9 +392,10 @@ public class TemperatureView extends VerticalLayout implements View, ValueEventL
 		}
 		
 		
+		//Get the last reading of the temperature list 
 		TemperatureEntity temperatureEntity=timeTemperatureList.get(timeTemperatureList.size()-1);
 
-		
+		//update the temperature on gaugeSeries
 		getUI().access(new Runnable() {
 			
 			@Override
@@ -427,9 +437,6 @@ public class TemperatureView extends VerticalLayout implements View, ValueEventL
 		
 		View.super.beforeLeave(event);
 	}
-
-
-
 
 
 }

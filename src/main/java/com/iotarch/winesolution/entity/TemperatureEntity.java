@@ -26,7 +26,7 @@ public class TemperatureEntity extends AbstractFirebaseEntity {
 	}
 
 	
-	public String getDate() {
+	public String getDate() {	
 		return new SimpleDateFormat("yyyy/MM/dd hh:mm").format(new Date(time));
 	}
 	
@@ -36,6 +36,16 @@ public class TemperatureEntity extends AbstractFirebaseEntity {
 	
 	public void setTemp(double temp) {
 		this.temp = temp;
+	}
+
+	@Override
+	public Long getTime() {	
+		return super.getTime();
+	}
+
+	@Override
+	public void setTime(Long time) {
+		super.setTime(time);
 	}
 	
 	

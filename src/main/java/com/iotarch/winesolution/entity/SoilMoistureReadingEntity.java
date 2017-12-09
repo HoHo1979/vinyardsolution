@@ -19,6 +19,16 @@ public class SoilMoistureReadingEntity extends AbstractFirebaseEntity {
 	
 	
 
+	@Override
+	public Long getTime() {	
+		return super.getTime();
+	}
+
+	@Override
+	public void setTime(Long time) {
+		super.setTime(time);
+	}
+
 	public String getMoisture() {
 		return moisture;
 	}
@@ -34,7 +44,7 @@ public class SoilMoistureReadingEntity extends AbstractFirebaseEntity {
 		this.status = status;
 	}
 	
-	public String getDate() {
+	public String getDate() {	
 		return new SimpleDateFormat("yyyy-MM-dd hh:mm").format(new Date(time));
 	}
 	
