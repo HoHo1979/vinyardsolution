@@ -4,8 +4,8 @@ public class StringHelper {
 
 	public static final String TIME="Time";
 	public static final String TEMPERATURE="Temperature";
-	public static final String CURRENT_TEMPERATURE = "Curent Temperature";
-	public static final String TEMPERATURE_CHART_SUBTITLE = "Temperature in a Day evey 15 mins";
+	public static final String CURRENT_TEMPERATURE = "Current Temperature";
+	public static final String TEMPERATURE_CHART_SUBTITLE = "Celsius Temperature";
 	public static final String SENSOR_NAME = "Sensor Name";
 	public static final String SENSOR_TYPE = "Sensor Type";
 	public static final String LAT = "Latitude";

@@ -16,6 +16,8 @@ public class TemperatureEntity extends AbstractFirebaseEntity {
 
 	double temp;
 	
+	Long time;
+	
 	public TemperatureEntity() {
 		
 	}

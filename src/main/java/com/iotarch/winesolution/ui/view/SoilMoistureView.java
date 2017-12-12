@@ -47,7 +47,6 @@ public class SoilMoistureView extends VerticalLayout implements View {
 	
 	public static final String NAME="soilMoistureView";
 	
-	List<SoilMoistureReadingEntity> soilMoistureReadings;
 	
 	MyFirebaseDataProvider<SoilMoistureReadingEntity> mySensorReadingFirebaseDataProvider;
 	
@@ -119,6 +118,9 @@ public class SoilMoistureView extends VerticalLayout implements View {
 						 .setCaption("Reading");	
 		sensorReadingGrid.addColumn(SoilMoistureReadingEntity::getStatus).setCaption("Status");
 		sensorReadingGrid.addColumn(SoilMoistureReadingEntity::getDate).setCaption("Time");
+		
+		
+		
 		
 		sensorGrid.setDataProvider(mySensorFirebaseDataProvier);
 			
